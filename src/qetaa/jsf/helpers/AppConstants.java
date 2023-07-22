@@ -15,9 +15,9 @@ public class AppConstants {
 	//public final static String HOST_ESCAPED = "http%3A%2F%2Flocalhost:8081%2Fjsf%2F";
 	
 	//for server
-	public final static String APP_HOST = "http://52.54.251.161/";
-	public final static String APP_HOST_UNSECURE = "http://52.54.251.161/";
-	public final static String HOST_ESCAPED = "http://52.54.251.161/";
+	public final static String APP_HOST = "http://52.54.251.161:8080/";
+	public final static String APP_HOST_UNSECURE = "http://52.54.251.161:8080/";
+	public final static String HOST_ESCAPED = "http://52.54.251.161:8080/";
 	
 	//===============SERVICES=================//
 	private final static String CUSTOMER_SERVICE = SERVICE_HOST + "/service-qetaa-customer/rest/";
