@@ -19,8 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.imageio.ImageIO;
 
-import org.jboss.security.Base64Encoder;
-import org.jboss.security.Base64Decoder;
+import java.util.Base64;;
 
 public class Helper {
 	private static String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxuz1234567890";
@@ -109,8 +108,7 @@ public class Helper {
 		String imageString = base64Image.split(",")[1];
 		BufferedImage image = null;
 		byte[] imageBytes;
-		BASE64Decoder decoder = new BASE64Decoder();
-		imageBytes = decoder.decodeBuffer(imageString);
+		imageBytes = Base64.getDecoder().decode(imageString);
 		ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
 		image = ImageIO.read(bis);
 		bis.close();
