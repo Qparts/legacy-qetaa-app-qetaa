@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+
+<div class="modal fade" id="myModal2" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">#{lex.createNewAccount}</h4>
+				</div>
+
+				<h:form id="form-register-main">
+					<h:panelGroup rendered="#{Character.toString(loginBean.loginStatus) eq 'N'}">
+						<div class="modal-body">
+
+							<div align="center" class="col-xs-12">
+								<h:commandLink value="#{lex.registerWithEmail}"
+									actionListener="#{loginBean.chooseEmailRegistration()}"
+									styleClass="bg-login col-xs-12">
+									<f:ajax execute="@this" render=":form-register-email @form" />
+								</h:commandLink>
+							</div>
+							<br />
+							<h:panelGroup rendered="false">
+								<h4 id="bg-twitter">
+									<i class="fa fa-twitter" aria-hidden="true"></i>
+									#{lex.registerWithTwitter}
+								</h4>
+							</h:panelGroup>
+							<div align="center" class="col-xs-12" style="padding-top: 10px;">
+								<h:commandLink value="#{lex.registerWithFacebook}"
+									styleClass="bg-facebook col-xs-12"
+									actionListener="#{loginBean.chooseFacebookLogin()}">
+									<f:ajax execute="@this"
+										render=":form-register-main :form-register-email" />
+								</h:commandLink>
+							</div>
+							<br /> <br /> <br /> <br /> <br />
+						</div>
+					</h:panelGroup>
+				</h:form>
+				<h:form id="form-register-email"
+					styleClass="form-horizontal pageform">
+					<h:panelGroup
+						rendered="#{Character.toString(loginBean.loginStatus) eq 'R' and Character.toString(loginBean.loginMechanism) eq 'E'}">
+						<div class="modal-body">
+							<div>
+								<h:messages />
+							</div>
+							<div class="row">
+								<h:panelGroup rendered="#{loginBean.smsCode eq null}">
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.firstName}</p>
+												<h:inputText value="#{loginBean.emailAccess.firstName}"
+													styleClass="form-control"
+													disabled="#{loginBean.smsCode != null}" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.lastName}</p>
+												<h:inputText value="#{loginBean.emailAccess.lastName}"
+													styleClass="form-control"
+													disabled="#{loginBean.smsCode != null}" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.email}</p>
+												<h:inputText value="#{loginBean.emailAccess.email}"
+													styleClass="form-control"
+													validatorMessage="#{lex.invalidEmail}"
+													disabled="#{loginBean.smsCode != null}">
+													<f:validateRegex
+														pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+												</h:inputText>
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.mobile}</p>
+												<h:inputText value="#{loginBean.emailAccess.mobile}"
+													styleClass="form-control"
+													validatorMessage="#{lex.invalidMobile}"
+													disabled="#{loginBean.smsCode != null}">
+													<f:validateRegex
+														pattern="^([05]\d)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" />
+												</h:inputText>
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.password}</p>
+												<h:inputSecret value="#{loginBean.emailAccess.password}"
+													styleClass="form-control"
+													disabled="#{loginBean.smsCode != null}" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+
+
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.confirmPassword}</p>
+												<h:inputSecret
+													value="#{loginBean.emailAccess.confirmPassword}"
+													styleClass="form-control"
+													disabled="#{loginBean.smsCode != null}" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{loginBean.smsCode != null}">
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.smsCode}</p>
+												<h:inputSecret value="#{loginBean.smsCodeUser}"
+													styleClass="form-control" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+							</div>
+
+							<div>
+
+								<h:panelGroup rendered="#{loginBean.smsCode eq null}">
+									<div align="center">
+										<h:commandLink value="#{lex.requestSMS}"
+											actionListener="#{loginBean.requestSMS()}"
+											styleClass="bg-login">
+											<f:ajax execute="@form" render="@form" />
+										</h:commandLink>
+									</div>
+									<br />
+								</h:panelGroup>
+								<h:panelGroup rendered="#{loginBean.smsCode != null}">
+									<div align="center">
+										<h:commandLink value="#{lex.activate}"
+											actionListener="#{loginBean.activateAndRegisterSMS()}"
+											styleClass="bg-login">
+										</h:commandLink>
+									</div>
+								</h:panelGroup>
+							</div>
+
+						</div>
+					</h:panelGroup>
+				</h:form>
+				<!-- start facebook register -->
+
+				<h:form id="form-register-facebook"
+					styleClass="form-horizontal pageform">
+					<h:panelGroup
+						rendered="#{Character.toString(loginBean.loginStatus) eq 'R' and Character.toString(loginBean.loginMechanism) eq 'F'}">
+						<div class="modal-body">
+							<div>
+								<h:messages style="color:red" />
+							</div>
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="col-sm-12">
+											<p>#{lex.firstName}</p>
+											<h:inputText value="#{loginBean.facebookAccess.firstName}"
+												styleClass="form-control"
+												disabled="#{loginBean.smsCode != null}" />
+											<span>*</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="col-sm-12">
+											<p>#{lex.lastName}</p>
+											<h:inputText value="#{loginBean.facebookAccess.lastName}"
+												styleClass="form-control"
+												disabled="#{loginBean.smsCode != null}" />
+											<span>*</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="col-sm-12">
+											<p>#{lex.email}</p>
+											<h:inputText value="#{loginBean.facebookAccess.email}"
+												styleClass="form-control"
+												disabled="#{loginBean.smsCode != null}" />
+											<span>*</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="col-sm-12">
+											<p>#{lex.mobile}</p>
+											<h:inputText value="#{loginBean.facebookAccess.mobile}"
+												styleClass="form-control"
+												disabled="#{loginBean.smsCode != null}">
+												<f:validateRegex
+													pattern="^([05]\d)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" />
+											</h:inputText>
+											<span>*</span>
+										</div>
+									</div>
+								</div>
+								<h:panelGroup rendered="#{loginBean.smsCode != null}">
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<p>#{lex.smsCode}</p>
+												<h:inputSecret value="#{loginBean.smsCodeUser}"
+													styleClass="form-control" />
+												<span>*</span>
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+							</div>
+
+							<div>
+								<h:panelGroup rendered="#{loginBean.smsCode eq null}">
+									<div align="center">
+										<h:commandLink value="#{lex.requestSMS}"
+											actionListener="#{loginBean.requestSMSFacebook()}"
+											styleClass="bg-login">
+											<f:ajax execute="@form" render="@form" />
+										</h:commandLink>
+									</div>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{loginBean.smsCode != null}">
+									<div align="center">
+										<h:commandLink value="#{lex.activate}"
+											actionListener="#{loginBean.activateAndRegisterSMSFaceook()}"
+											styleClass="bg-login">
+										</h:commandLink>
+									</div>
+								</h:panelGroup>
+							</div>
+						</div>
+					</h:panelGroup>
+				</h:form>
+				<!-- end facebook register-->
+			</div>
+		</div>
+	</div>
+
+</ui:composition>

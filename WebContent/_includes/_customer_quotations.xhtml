@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+
+
+	<h2>Quotation Orders</h2>
+	<ui:repeat var="cart" value="#{customerCartBean.carts}">
+		<ul class="w3-ul w3-card-4 q-order-tab">
+			<li class="w3-padding-4">
+				<div class="w3-panel #{cart.panelClass}" align="center">
+					<h:panelGrid columns="4" style="width:100%">
+						<h:panelGroup>
+							<h:outputText value="Order # " />
+							<br />
+							<h:outputText value="#{cart.cartId}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<h:outputText value="Date" />
+							<br />
+							<h:outputText value="#{cart.created}">
+								<f:convertDateTime pattern="dd-MMM-yyyy" />
+							</h:outputText>
+						</h:panelGroup>
+						<h:panelGroup>
+							<h:outputText value="Vehicle " />
+							<br />
+							<h:outputText value="#{cart.vehicleModel.fullVehicleName}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<h:outputText value="Status" />
+							<br />
+							<h:outputText value="Under Review"
+								rendered="#{(Character.toString(cart.status) eq 'R') or (Character.toString(cart.status) eq 'Q') or (Character.toString(cart.status) eq 'W')}" />
+							<h:outputText value="Completed" rendered="#{Character.toString(cart.status) eq 'S'}" />
+							<h:outputText value="New" rendered="#{Character.toString(cart.status) eq 'N'}" />
+						</h:panelGroup>
+					</h:panelGrid>
+				</div>
+				<div class="w3-container w3-padding-8" align="left">
+					<div class="w3-third w3-padding-8">
+						<h:dataTable value="#{cart.cartItems}" var="item"
+							styleClass="w3-table w3-striped w3-border"
+							headerClass="w3-border-bottom w3-light-grey">
+							<f:facet name="header">
+								<div align="center">
+									<h:outputText value="My Cart Items" />
+								</div>
+							</f:facet>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Item" />
+								</f:facet>
+								<h:outputText value="#{item.itemName}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Quantity" />
+								</f:facet>
+								<div align="center">
+									<h:outputText value="#{item.quantity}" />
+								</div>
+							</h:column>
+						</h:dataTable>
+					</div>
+					<div class="w3-twothird">
+						<h:panelGroup style="float:right;">
+							<h:panelGroup styleClass="w3-right">
+								<h:panelGrid columns="2">
+									<h:outputText value="VIN" styleClass="q-bold w3-left" />
+									<h:outputText value="#{cart.vin}" styleClass="w3-right" />
+									<h:outputText value="Revised on" styleClass="q-bold" />
+									<h:outputText value="#{cart.qo.submitted}"
+										styleClass="w3-right">
+										<f:convertDateTime pattern="dd-MMM-yyyy" />
+									</h:outputText>
+									<h:outputText value="Completed on" styleClass="q-bold"
+										rendered="#{Character.toString(cart.status) eq 'S'}" />
+									<h:outputText value="#{cart.submitted}" styleClass="w3-right">
+										<f:convertDateTime pattern="dd-MMM-yyyy" />
+									</h:outputText>
+								</h:panelGrid>
+							</h:panelGroup>
+						</h:panelGroup>
+					</div>
+					<div>
+						<h:dataTable value="#{cart.qo.qoItems}" var="item"
+							rendered="#{null != cart.qo.qoItems}"
+							styleClass="w3-table w3-striped w3-border"
+							headerClass="w3-border-bottom w3-light-grey"
+							footerClass="w3-border-top w3-light-grey">
+							<f:facet name="header">
+								<h:panelGrid columns="2" style="width:100%">
+									<div align="center">Quotation</div>
+								</h:panelGrid>
+							</f:facet>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Item" style="float:left;" />
+								</f:facet>
+								<h:outputText value="#{item.itemName}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<div align="center">
+										<h:outputText value="Requested" />
+									</div>
+								</f:facet>
+								<div align="center">
+									<h:outputText value="#{item.quantity}" />
+								</div>
+							</h:column>
+							<h:column rendered="#{Character.toString(cart.status) eq 'S'}">
+								<f:facet name="header">
+									<div align="center">
+										<h:outputText value="Available" />
+									</div>
+								</f:facet>
+								<div align="center">
+									<h:outputText value="#{item.selectedTotalQuantity}" />
+								</div>
+							</h:column>
+
+							<h:column rendered="#{Character.toString(cart.status) eq 'S'}">
+								<f:facet name="header">
+									<h:outputText value="Unit Price" />
+								</f:facet>
+								<div align="center">
+									<h:outputText
+										value="#{item.selectedTotalPriceSales / item.selectedTotalQuantity}"
+										style="float:left;">
+										<f:convertNumber currencySymbol="SR " type="currency" />
+									</h:outputText>
+								</div>
+							</h:column>
+
+							<h:column rendered="#{Character.toString(cart.status) eq 'S'}">
+								<f:facet name="header">
+									<h:outputText value="Gross Price" />
+								</f:facet>
+								<div align="center">
+									<h:outputText value="#{item.selectedTotalPriceSales}"
+										style="float:left;">
+										<f:convertNumber currencySymbol="SR " type="currency" />
+									</h:outputText>
+								</div>
+							</h:column>
+							<f:facet name="footer">
+								<h:panelGroup layout="block" align="center"
+									rendered="#{Character.toString(cart.status) eq 'S'}">
+									<div align="center">
+										<h:outputText value="Total Price " />
+										<br />
+										<h:outputText styleClass="w3-padding-12 q-large-text"
+											value="#{cart.qo.selectedItemsTotalSales}">
+											<f:convertNumber currencySymbol="SR " type="currency" />
+										</h:outputText>
+									</div>
+								</h:panelGroup>
+							</f:facet>
+						</h:dataTable>
+					</div>
+					<div align="center">
+						<h:outputLink rendered="#{Character.toString(cart.status) eq 'S'}"
+							value="parts_order?order=#{cart.cartId}">
+											Order Parts
+										</h:outputLink>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<br />
+	</ui:repeat>
+	
+
+
+
+</ui:composition>

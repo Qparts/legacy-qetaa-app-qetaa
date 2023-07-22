@@ -1,0 +1,296 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+
+	<o:form id="form-3" styleClass="form-inline" includeViewParams="true">
+		<div align="center" class="col-md-6 col-md-offset-3 col-xs-12 ">
+			<h:outputText
+				value="لم تتم عملية الدفع بنجاح, الرجاء المحاولة مرة اخرى"
+				rendered="#{partsOrderBean.failed}" styleClass="q-bold"
+				style="color:red;" />
+			<p:messages id="msgs" />
+		</div>
+
+		<div align="center" class="col-lg-12 col-md-12 col-xs-12">
+			<div
+				class="col-lg-2 col-lg-offset-3 col-md-2 col-md-offset-3 col-xs-6 table-bordered">
+				<p style="font-size: 12px; color: #aaaaaa">#{lex.totalParts}</p>
+				<p>
+					<h:outputText value="#{partsOrderBean.partOrder.newTotalPrice}"
+						style="font-weight: 600;color: #888">
+						<f:convertNumber type="currency" currencySymbol="SR "
+							locale="en_US" />
+					</h:outputText>
+				</p>
+			</div>
+			<div class="col-lg-2 col-md-2 col-xs-6 table-bordered">
+				<p style="font-size: 12px; color: #aaaaaa">#{lex.deliveryFees}</p>
+				<p>
+					<h:outputText value="#{partsOrderBean.deliveryCharges}"
+						style="font-weight: 600;color: #888" id="del-fees">
+						<f:convertNumber type="currency" currencySymbol="SR "
+							locale="en_US" />
+					</h:outputText>
+				</p>
+			</div>
+			<div class="col-lg-2 col-md-2 col-xs-12 table-bordered">
+				<p style="font-size: 12px; color: #aaaaaa">#{lex.vat}</p>
+				<p>
+					<h:outputText
+						value="#{(partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage)}"
+						style="font-weight: 600;color: #888" id="vat">
+						<f:convertNumber type="currency" currencySymbol="SR "
+							locale="en_US" />
+					</h:outputText>
+				</p>
+			</div>
+			<div
+				class="col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-xs-12 table-bordered">
+				<h:outputText value="#{lex.total}"
+					style="font-size: 12px; color: #aaaaaa" />
+					<br/>
+				<h:outputText id="total-price"
+					style="color: #{partsOrderBean.cart.promoCodeObject.discountPromo ? '#aaa;text-decoration: line-through' : '#cc4f1d'}; font-weight: 600; font-size: 20px"
+					value="#{(partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage) + partsOrderBean.deliveryCharges + partsOrderBean.partOrder.newTotalPrice}">
+					<f:convertNumber type="currency" currencySymbol="SR "
+						locale="en_US" />
+				</h:outputText>
+				<br/>
+				<br/>
+				<h:panelGroup id="promo-price">
+					<h:panelGroup
+						rendered="#{partsOrderBean.promVerified and partsOrderBean.cart.promoCodeObject.discountPromo}">
+						<h:outputText value="#{lex.promoDiscount}"
+							style="font-size: 12px; color: #aaaaaa" />
+						<br />
+						<h:outputText
+							value="#{partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.deliveryCharges + partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.partOrder.newTotalPrice}"
+							style="color:#cc4f1d">
+							<f:convertNumber currencySymbol="SR " type="currency" />
+						</h:outputText>
+						<br />
+						<br />
+						<h:outputText value="#{lex.totalPriceAfterDiscount}"
+							style="font-size: 12px; color: #aaaaaa" />
+						<p style="font-size: 20px;">
+							<h:outputText style="color: #cc4f1d; font-weight: 600;"
+								id="total-price-promo"
+								value="#{((partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage) + partsOrderBean.deliveryCharges + partsOrderBean.partOrder.newTotalPrice) - partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.deliveryCharges - partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.partOrder.newTotalPrice}">
+								<f:convertNumber type="currency" currencySymbol="SR "
+									locale="en_US" />
+							</h:outputText>
+						</p>
+
+					</h:panelGroup>
+
+
+				</h:panelGroup>
+
+
+				<div>
+					<h:panelGroup id="promo-question">
+						<h:panelGroup rendered="#{not partsOrderBean.promVerified}">
+							<p>#{lex.promCodeQuestion}</p>
+							<h:selectBooleanCheckbox value="#{partsOrderBean.havePromo}"
+								styleClass="form-control" style="height:20px">
+								<f:ajax execute="@this" render="promo-panel"></f:ajax>
+							</h:selectBooleanCheckbox>
+						</h:panelGroup>
+					</h:panelGroup>
+					<h:panelGroup id="promo-panel">
+						<h:panelGroup
+							rendered="#{partsOrderBean.havePromo and not partsOrderBean.promVerified}">
+							<p>#{lex.promCodeEnter}</p>
+							<h:inputText id="in" value="#{partsOrderBean.promCodeString}"
+								styleClass="form-control" style="width:100px"
+								disabled="#{partsOrderBean.promVerified}" />
+							<br />
+							<h:commandLink
+								actionListener="#{partsOrderBean.verifyPromCode()}"
+								value="#{lex.promCodeVerify}"
+								rendered="#{not partsOrderBean.promVerified}">
+								<f:ajax execute="in @this"
+									render="promo-panel promo-question promo-price total-price msgs"></f:ajax>
+							</h:commandLink>
+							<br />
+						</h:panelGroup>
+
+					</h:panelGroup>
+
+				</div>
+
+			</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-xs-12">
+			<br />
+		</div>
+
+		<div class="col-lg-12 col-md-12 col-xs-12">
+			<div class="col-md-46 col-md-offset-4 col-xs-12">
+				<h:outputText value="#{lex.address}"
+					style="font-size: 12px; color: #bbbbbb" />
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:inputText styleClass="form-control" id="address1"
+					value="#{partsOrderBean.address.line1}">
+				</h:inputText>
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:outputText value="#{lex.address2}"
+					style="font-size: 12px; color: #aaaaaa" />
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:inputText id="address2" styleClass="form-control"
+					value="#{partsOrderBean.address.line2}">
+				</h:inputText>
+			</div>
+
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:outputText value="#{lex.city}"
+					style="font-size: 12px; color: #aaaaaa" />
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:selectOneMenu requiredMessage="Select City"
+					styleClass="form-control" value="#{partsOrderBean.selectedCityId}"
+					required="true" id="cities">
+					<f:selectItems value="#{partsOrderBean.cities}" var="city"
+						itemValue="#{city.id}" itemLabel="#{city.nameAr}">
+					</f:selectItems>
+				</h:selectOneMenu>
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:outputText value="#{lex.paymentMethod}"
+					style="font-size: 12px; color: #aaaaaa" />
+			</div>
+			<div class="col-md-4 col-md-offset-4 col-xs-12">
+				<h:selectOneMenu value="#{partsOrderBean.paymentMethod}"
+					id="payment" styleClass="form-control"
+					onchange="showDivAndHideOthers(this)">
+					<f:selectItem itemValue="N" itemLabel="#{lex.selectPayment}" />
+					<f:selectItem itemValue="W" itemLabel="#{lex.wire}" />
+					<f:selectItem itemValue="V" itemLabel="#{lex.visa}" />
+					<f:selectItem itemValue="M" itemLabel="#{lex.masterCard}" />
+					<f:ajax />
+				</h:selectOneMenu>
+				<br /> <br />
+			</div>
+
+			<div class="col-xs-12" id="visa-div"
+				style="display:#{Character.toString(partsOrderBean.paymentMethod) eq 'V' ? 'block' : 'none'};">
+				<div align="center">
+					<h:graphicImage value="/resources/images/visa.png" />
+					<br /> <br />
+				</div>
+				<div class="col-md-3 col-md-offset-3 col-xs-12">
+					<h:outputText value="#{lex.cardNumber}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText id="number" value="#{partsOrderBean.visa.number}"
+						styleClass="form-control" a:maxlength="16">
+					</h:inputText>
+				</div>
+				<div class="col-md-3 col-xs-12">
+					<h:outputText value="#{lex.cardName}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText value="#{partsOrderBean.visa.name}"
+						styleClass="form-control">
+					</h:inputText>
+				</div>
+				<div class="col-md-2 col-md-offset-3 col-xs-6">
+					<h:outputText value="#{lex.cartYear}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:selectOneMenu styleClass="form-control"
+						value="#{partsOrderBean.visa.year}">
+						<f:selectItems value="#{partsOrderBean.expiryDates}" var="year"
+							itemValue="#{year}" itemLabel="#{year}" />
+					</h:selectOneMenu>
+				</div>
+				<div class="col-md-2 col-xs-6">
+					<h:outputText value="#{lex.cartMonth}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:selectOneMenu styleClass="form-control"
+						value="#{partsOrderBean.visa.month}">
+						<f:selectItems value="#{partsOrderBean.expiryMonths}" var="month"
+							itemValue="#{month}" itemLabel="#{month}" />
+					</h:selectOneMenu>
+				</div>
+				<div class="col-md-2 col-md-offset-0 col-xs-6 col-xs-offset-3">
+					<h:outputText value="#{lex.cvc}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText value="#{partsOrderBean.visa.cvc}"
+						styleClass="form-control">
+					</h:inputText>
+				</div>
+			</div>
+
+
+			<div class="col-xs-12" id="mc-div"
+				style="display: #{Character.toString(partsOrderBean.paymentMethod) eq 'M' ? 'block' : 'none'};">
+				<div align="center">
+					<h:graphicImage value="/resources/images/mastercard.png" />
+					<br /> <br />
+				</div>
+				<div class="col-md-3 col-md-offset-3 col-xs-12">
+					<h:outputText value="#{lex.cardNumber}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText value="#{partsOrderBean.masterCard.number}"
+						styleClass="form-control" a:maxlength="16">
+					</h:inputText>
+				</div>
+				<div class="col-md-3 col-xs-12">
+					<h:outputText value="#{lex.cardName}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText value="#{partsOrderBean.masterCard.name}"
+						styleClass="form-control">
+					</h:inputText>
+				</div>
+				<div class="col-md-2 col-md-offset-3 col-xs-6">
+					<h:outputText value="#{lex.cartYear}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:selectOneMenu styleClass="form-control"
+						value="#{partsOrderBean.masterCard.year}">
+						<f:selectItems value="#{partsOrderBean.expiryDates}" var="year"
+							itemValue="#{year}" itemLabel="#{year}" />
+					</h:selectOneMenu>
+				</div>
+				<div class="col-md-2 col-xs-6">
+					<h:outputText value="#{lex.cartMonth}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:selectOneMenu styleClass="form-control"
+						value="#{partsOrderBean.masterCard.month}">
+						<f:selectItems value="#{partsOrderBean.expiryMonths}" var="month"
+							itemValue="#{month}" itemLabel="#{month}" />
+					</h:selectOneMenu>
+				</div>
+				<div class="col-md-2 col-md-offset-0 col-xs-6 col-xs-offset-3">
+					<h:outputText value="#{lex.cvc}"
+						style="font-size: 12px; color: #aaaaaa" />
+					<h:inputText value="#{partsOrderBean.masterCard.cvc}"
+						styleClass="form-control">
+					</h:inputText>
+				</div>
+			</div>
+
+		</div>
+
+		<br />
+		<div align="center" class="col-md-2 col-md-offset-5  col-xs-12">
+			<br />
+			<h:commandButton actionListener="#{partsOrderBean.next()}"
+				styleClass="checkout-btn" value="#{lex.checkout}">
+				<f:ajax execute="@form" render="@all"></f:ajax>
+				<f:param name="order" value="#{partsOrderBean.cart.id}"></f:param>
+			</h:commandButton>
+			<br /> <br />
+			<h:commandButton value="#{lex.previous}" styleClass="btn"
+				actionListener="#{partsOrderBean.previous()}">
+				<f:ajax execute="@this" render="@all"></f:ajax>
+				<f:param name="order" value="#{partsOrderBean.cart.id}"></f:param>
+			</h:commandButton>
+		</div>
+	</o:form>
+
+</ui:composition>

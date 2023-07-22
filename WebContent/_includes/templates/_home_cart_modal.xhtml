@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+
+<h:form id="form-1">
+		<!-- cart dialog -->
+		<div class="modal fade" id="myModal3" role="dialog">
+			<div class="container" width="500px;">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">#{lex.quotationOrder}</h4>
+						</div>
+						<div class="modal-body">
+							<div style="margin-bottom: 20px;" />
+							<div class="progress" id="progress1">
+								<div class="progress-bar" role="progressbar" aria-valuenow="20"
+									aria-valuemin="0" aria-valuemax="100"></div>
+								<span class="progress-type">التقدم العام</span> <span
+									class="progress-completed">0%</span>
+							</div>
+							<h:panelGroup id="step">
+								<div class="row step">
+									<div id="div1"
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 0 ? 'activestep' : ''}">
+										<i class="fa fa-car" aria-hidden="true"></i>
+										<p>#{lex.make}</p>
+									</div>
+									<div
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 1 ? 'activestep' : ''}">
+										<i class="fa fa-bullseye" aria-hidden="true"></i>
+										<p>#{lex.model}</p>
+									</div>
+									<div
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 2 ? 'activestep' : ''}">
+										<i class="fa fa-calendar-o" aria-hidden="true"></i>
+										<p>#{lex.theYear}</p>
+									</div>
+									<div
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 3 ? 'activestep' : ''}">
+										<i class="fa fa-sort-numeric-asc" aria-hidden="true"></i>
+										<p>#{lex.theVin}</p>
+									</div>
+									<div
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 4 ? 'activestep' : ''}">
+										<i class="fa fa-columns" aria-hidden="true"></i>
+										<p>#{lex.theItems}</p>
+									</div>
+									<div id="last"
+										class="col-md-2 col-sm-2 col-xs-2 #{autocartbean.step eq 5 ? 'activestep' : ''}">
+										<i class="fa fa-paper-plane" aria-hidden="true"></i>
+										<p>#{lex.theOrder}</p>
+									</div>
+								</div>
+							</h:panelGroup>
+							<h:panelGroup id="panel">
+								<div class="row setup-content step activeStepInfo" id="step-1">
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.selectMake}</p>
+											<p:dataGrid value="#{autocartbean.makes}" var="make"
+												columns="3" styleClass="order-datagrid" style="width: 100%">
+												<p:column style="width:10%">
+													<div align="center">
+														<p:commandLink value="#{make.nameAr}" process="@this"
+															actionListener="#{autocartbean.chooseMake(make)}"
+															update=":form-1:panel :form-1:step"
+															oncomplete="resetActive(event, 20, 'step-2');" />
+													</div>
+												</p:column>
+											</p:dataGrid>
+										</div>
+									</div>
+								</div>
+								<div class="row setup-content step hiddenStepInfo" id="step-2">
+									<p>#{lex.make}: #{autocartbean.fullVehicleName}</p>
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.selectModel}</p>
+											<p:dataGrid value="#{autocartbean.selectedMake.models}"
+												var="type">
+												<p:column>
+													<p:commandLink value="#{type.nameAr}" process="@this"
+														oncomplete="resetActive(event, 40, 'step-3');"
+														actionListener="#{autocartbean.chooseModel(type)}"
+														update=":form-1:panel :form-1:step" />
+												</p:column>
+											</p:dataGrid>
+											<br />
+											<h:commandButton
+												actionListener="#{autocartbean.resetToStep(0)}"
+												value="#{lex.previous}" styleClass="btn">
+												<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+											</h:commandButton>
+										</div>
+									</div>
+								</div>
+								<div class="row setup-content step hiddenStepInfo" id="step-3">
+									<p>#{lex.make}: #{autocartbean.fullVehicleName}</p>
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.selectYear}</p>
+											<p:dataGrid value="#{autocartbean.selectedModel.modelYears}"
+												var="modelYear">
+												<p:column>
+													<p:commandLink value="#{modelYear.year}" process="@this"
+														actionListener="#{autocartbean.chooseModelYear(modelYear)}"
+														update=":form-1:panel :form-1:step"
+														oncomplete="resetActive(event, 60, 'step-4');" />
+												</p:column>
+											</p:dataGrid>
+											<br />
+											<h:commandButton
+												actionListener="#{autocartbean.resetToStep(1)}"
+												value="#{lex.previous}" styleClass="btn">
+												<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+											</h:commandButton>
+										</div>
+									</div>
+								</div>
+								<div class="row setup-content step hiddenStepInfo" id="step-4">
+									<p>#{lex.make}: #{autocartbean.fullVehicleName}</p>
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.enterVin}</p>
+											<p:tooltip id="toolTipContent" for="content" position="top"
+												styleClass="reg-image">
+												<p:graphicImage name="images/reg.jpg" styleClass="reg-image" />
+											</p:tooltip>
+											<h:outputLink id="content" value="#">
+												<i class="fa fa-question-circle" style="font-size: 15px;"></i>
+											</h:outputLink>
+											<h:inputText id="vin" value="#{autocartbean.cart.vin}"
+												required="true" requiredMessage="#{lex.enterVinReq}"
+												validatorMessage="#{lex.invalidVin2}"
+												a:placeHolder="#{lex.vin}" a:maxlength="17"
+												styleClass="form-control"
+												style="width:230px;text-transform: uppercase;margin: auto;">
+												<f:validateRegex pattern="^[a-zA-Z0-9]*$"></f:validateRegex>
+											</h:inputText>
+
+											<p:message for="vin" id="vin-msg" style="height:10px;" />
+											<br />
+
+											<h:commandButton
+												actionListener="#{autocartbean.resetToStep(2)}"
+												value="#{lex.previous}" styleClass="btn">
+												<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+											</h:commandButton>
+
+											<h:commandButton actionListener="#{autocartbean.verifyVin()}"
+												value="#{lex.next}" styleClass="btn">
+												<f:ajax execute="@this :form-1:vin"
+													render="vin-msg vin :form-1:step" />
+											</h:commandButton>
+										</div>
+									</div>
+								</div>
+								<div class="row setup-content step hiddenStepInfo" id="step-5">
+									<p>#{lex.make}: #{autocartbean.fullVehicleName}</p>
+									<p>#{lex.vin}: #{autocartbean.cart.vin}</p>
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.addItems}</p>
+											<h:panelGroup id="table-holder">
+												<h:dataTable value="#{autocartbean.cart.cartItems}"
+													var="item" id="table" styleClass="table">
+													<h:column>
+														<f:facet name="header">
+															<h:outputText value="#{lex.itemNameOrNum}" />
+														</f:facet>
+														<h:inputText styleClass="form-control"
+															value="#{item.name}" required="true"
+															requiredMessage="#{lex.itemNameReq}">
+															<f:ajax />
+														</h:inputText>
+													</h:column>
+													<h:column>
+														<f:facet name="header">
+															<h:outputText value="#{lex.quantity}" />
+														</f:facet>
+														<h:selectOneMenu styleClass="q-form-control"
+															value="#{item.quantity}">
+															<f:selectItems value="#{autocartbean.quantityArray}"
+																var="var" itemValue="#{var}" itemLabel="#{var}" />
+															<f:ajax />
+														</h:selectOneMenu>
+													</h:column>
+													<h:column>
+														<f:facet name="header">
+															<h:outputText value="#{lex.remove}" />
+														</f:facet>
+														<h:commandLink
+															actionListener="#{autocartbean.removeItem(item)}"
+															value="">
+															<span class="btn glyphicon glyphicon-trash" />
+															<f:ajax render=":form-1:table :form-1:table-holder"
+																execute="@this" />
+														</h:commandLink>
+													</h:column>
+												</h:dataTable>
+											</h:panelGroup>
+											<h:commandLink actionListener="#{autocartbean.addItem()}"
+												value="أضف قطعة">
+												<span class="btn glyphicon glyphicon-plus" />
+												<f:ajax render=":form-1:table :form-1:item-msg"
+													execute="@this" />
+											</h:commandLink>
+											<br /> <br />
+											<div class="w3-padding-12">
+												<p:messages id="item-msg" />
+												<h:commandButton
+													actionListener="#{autocartbean.resetToStep(3)}"
+													value="#{lex.previous}" styleClass="btn">
+													<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+												</h:commandButton>
+												<h:commandButton
+													actionListener="#{autocartbean.verifyItems()}"
+													value="#{lex.next}" styleClass="btn">
+													<f:ajax execute="table" render="item-msg :form-1:step" />
+												</h:commandButton>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row setup-content step hiddenStepInfo" id="step-6">
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<h3 class="title-price">#{lex.sendOrder}</h3>
+											<h:panelGroup rendered="#{loginBean.logged}">
+												<p>#{lex.make}: #{autocartbean.fullVehicleName}</p>
+												<p>#{lex.vin}: #{autocartbean.cart.vin}</p>
+												<table class="table table-hover">
+													<thead>
+														<tr>
+															<th>#{lex.itemNameOrNum}</th>
+															<th>#{lex.quantity}</th>
+														</tr>
+													</thead>
+													<tbody>
+														<ui:repeat id="summary-table" var="item"
+															value="#{autocartbean.cart.cartItems}">
+															<tr>
+																<td><h:outputText value="#{item.name}" /></td>
+																<td><h:outputText value="#{item.quantity}" /></td>
+															</tr>
+														</ui:repeat>
+													</tbody>
+												</table>
+												<br />
+												<p class="title-price">#{lex.region}</p>
+												<h:selectOneMenu id="region" styleClass="form-control"
+													value="#{autocartbean.selectedRegionId}" required="true">
+													<f:selectItem itemValue="#{0}"
+														itemLabel="#{lex.selectRegion}" />
+													<f:selectItems value="#{autocartbean.regions}" var="city"
+														itemValue="#{city.id}" itemLabel="#{city.nameAr}" />
+													<f:ajax listener="#{autocartbean.chooseRegion()}"
+														execute="@this" render="city-panel submit" />
+												</h:selectOneMenu>
+												<h:panelGroup id="city-panel">
+													<h:panelGroup
+														rendered="#{autocartbean.selectedRegionId gt 0}">
+														<p class="title-price">#{lex.city}</p>
+														<h:selectOneMenu id="city" styleClass="form-control"
+															value="#{autocartbean.cart.cityId}" required="true">
+															<f:selectItems
+																value="#{autocartbean.selectedRegion.cities}" var="city"
+																itemValue="#{city.id}" itemLabel="#{city.nameAr}" />
+															<f:ajax />
+														</h:selectOneMenu>
+
+														<br />
+														<div>
+															<h:selectBooleanCheckbox style="height: 20px!important;"
+																styleClass="form-control" value="#{autocartbean.agree}">
+																<f:ajax execute="@this" render="submit"></f:ajax>
+															</h:selectBooleanCheckbox>
+															<a target="_blank" href="terms"><h:outputText
+																	value="  #{lex.agreeTerms}" /></a>
+														</div>
+													</h:panelGroup>
+												</h:panelGroup>
+
+											</h:panelGroup>
+											<br />
+											<h:panelGroup rendered="#{not loginBean.logged}">
+												<h:outputText />
+												<a onclick="hideModalAndShowLogin()"> <h:outputText
+														value="#{lex.loginToComplete}" />
+												</a>
+												<br />
+												<br />
+												<h:outputText value="#{lex.dontHaveAccount}" />
+												<a onclick="hideModalAndShowRegister()"> <h:outputText
+														value="#{lex.registerNow}" />
+												</a>
+												<br />
+												<br />
+											</h:panelGroup>
+											<br /> <br />
+											<h:commandButton
+												actionListener="#{autocartbean.resetToStep(4)}"
+												value="#{lex.previous}" styleClass="btn">
+												<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+											</h:commandButton>
+											<br /> <br />
+											<h:commandButton rendered="#{loginBean.logged}"
+												actionListener="#{autocartbean.submit()}" id="submit"
+												value="#{lex.submitOrder}"
+												disabled="#{(not (autocartbean.agree)) or (autocartbean.selectedRegionId eq 0)}"
+												styleClass="btn btn-primary hvr-push">
+												<f:ajax execute="@form" render="@all :complete" />
+											</h:commandButton>
+											<br />
+										</div>
+									</div>
+								</div>
+							</h:panelGroup>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</h:form>
+
+</ui:composition>

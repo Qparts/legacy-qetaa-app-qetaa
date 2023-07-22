@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+
+	<style>
+.tab {
+	display: none;
+}
+</style>
+
+	<h:outputScript>	
+			var selectedMake;		
+			var makes = [<ui:repeat value="#{autocartbean.makes}" var="make"
+			varStatus="loop">{
+  					"name": "#{make.nameAr}",
+  					"id" : #{make.id},
+  					"models" : [<ui:repeat var="model" value="#{make.models}"
+				varStatus="loop1">{
+  						"name" : "#{model.nameAr}",
+  						"id" : #{model.id},
+  						"modelYears" : [<ui:repeat var="modelYear"
+					value="#{model.modelYears}" varStatus="loop2">{"year" : #{modelYear.year}, "id" : #{modelYear.id}}
+  						<h:outputText value="#{loop2.last ? '' : ','}" />
+				</ui:repeat>]}
+  					<h:outputText value="#{loop1.last ? '' : ','}" />
+
+			</ui:repeat>]}<h:outputText value="#{loop.last ? '' : ','}" />
+		</ui:repeat>
+  			];
+  			
+  			//<![CDATA[
+  			 window.onload = function() {
+  			 	var currentTab = 0;
+				showTab(currentTab);
+  				var table = document.getElementById("makes-table-body");
+  				var cols = 0;
+  				for (i = 0; i < makes.length; i++) {
+    				if (table.rows.length == 0 || cols % 3 === 0){
+    					var tr = document.createElement("tr");
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseMake(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('makeid',makes[i].id);
+    					a.setAttribute('makename',makes[i].name);
+    					var txt = document.createTextNode(makes[i].name);
+    					a.appendChild(txt);
+    					td.appendChild(a); 
+    					tr.appendChild(td);
+    					table.appendChild(tr);
+    					cols++;
+    				} else {
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseMake(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('makeid',makes[i].id);
+    					a.setAttribute('makename',makes[i].name);
+    					var txt = document.createTextNode(makes[i].name);
+    					a.appendChild(txt);
+    					td.appendChild(a);
+    					var tr = table.rows[table.rows.length-1];
+    					tr.appendChild(td);
+    					cols++;
+    				}
+				}
+			}
+			
+			function chooseMake(element){
+				var makeid = element.getAttribute('makeid');
+				var makeName = element.getAttribute('makename');
+				//save to cookies,
+				document.cookie = "makeid=" + makeid;
+				document.cookie = "makeName=" + makeName;
+				document.cookie = "orderstep=" + 2;
+				//show second tab
+				showTab(1);
+				hideTab(0);
+				initModelsTab();
+			}
+			
+			function chooseModel(element){
+				var modelid = element.getAttribute('modelid');
+				var modelName = element.getAttribute('modelname');
+				//save to cookies,
+				document.cookie = "modelid=" + modelid;
+				document.cookie = "modelName=" + modelName;
+				document.cookie = "orderstep=" + 3;
+				//show second tab
+				showTab(2);
+				hideTab(1);
+				initModelYearsTab();
+			}
+			
+			function chooseModelYear(element){
+				var modelYearid = element.getAttribute('modelYearid');
+				var year = element.getAttribute('year');
+				//save to cookies,
+				document.cookie = "modelYearid=" + modelYearid;
+				document.cookie = "year=" + year;
+				document.cookie = "orderstep=" + 4;
+				//show second tab
+				showTab(3);
+				hideTab(2);
+			}
+			
+			function getSelectedModel(){
+				var make = getSelectedMake();
+				var name = "modelid=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				var modelid;
+				for(var i = 0; i <ca.length; i++) {
+       				var c = ca[i];
+        			while (c.charAt(0) == ' ') {
+            			c = c.substring(1);
+        			}
+        			if (c.indexOf(name) == 0) {
+            			modelid = c.substring(name.length, c.length);
+        			}
+        		
+    			}
+    			var model;
+  				for(i = 0; i < make.models.length; i++){
+  					if(make.models[i].id == modelid){
+  						model = make.models[i];
+  						break;
+  					}
+  				}
+  				return model;
+			}
+			
+			function getSelectedMake(){
+				var name = "makeid=";
+				var decodedCookie = decodeURIComponent(document.cookie);
+				var ca = decodedCookie.split(';');
+				var makeid;
+				for(var i = 0; i <ca.length; i++) {
+       				var c = ca[i];
+        			while (c.charAt(0) == ' ') {
+            			c = c.substring(1);
+        			}
+        			if (c.indexOf(name) == 0) {
+            			makeid = c.substring(name.length, c.length);
+        			}
+        		
+    			}
+    			var make;
+  				for(i = 0; i < makes.length; i++){
+  					if(makes[i].id == makeid){
+  						make = makes[i];
+  						break;
+  					}
+  				}
+  				return make;
+			}
+			
+			function initModelYearsTab(){
+				var model = getSelectedModel();
+				var table = document.getElementById("model-years-table-body");
+  				var cols = 0;
+  				
+  				for (i = 0; i < model.modelYears.length; i++) {
+    				if (table.rows.length == 0 || cols % 3 === 0){
+    					var tr = document.createElement("tr");
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseModelYear(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('modelYearid',model.modelYears[i].id);
+    					a.setAttribute('year',model.modelYears[i].year);
+    					var txt = document.createTextNode(model.modelYears[i].year);
+    					a.appendChild(txt);
+    					td.appendChild(a);
+    					tr.appendChild(td);
+    					table.appendChild(tr);
+    					cols++;
+    				} else {
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseModelYear(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('modelYearid',model.modelYears[i].id);
+    					a.setAttribute('year',model.modelYears[i].year);
+    					var txt = document.createTextNode(model.modelYears[i].year);
+    					a.appendChild(txt);
+    					td.appendChild(a);
+    					var tr = table.rows[table.rows.length-1];
+    					tr.appendChild(td);
+    					cols++;
+    				}
+				}
+			}
+			
+			function initModelsTab(){
+				
+				var table = document.getElementById("models-table-body");
+  				var cols = 0;
+  				var make = getSelectedMake();
+  				for (i = 0; i < make.models.length; i++) {
+    				if (table.rows.length == 0 || cols % 3 === 0){
+    					var tr = document.createElement("tr");
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseModel(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('modelid',make.models[i].id);
+    					a.setAttribute('modelname',make.models[i].name);
+    					var txt = document.createTextNode(make.models[i].name);
+    					a.appendChild(txt);
+    					td.appendChild(a);
+    					tr.appendChild(td);
+    					table.appendChild(tr);
+    					cols++;
+    				} else {
+    					var td = document.createElement("td");
+    					var a = document.createElement("a");
+    					a.setAttribute('onclick','chooseModel(this)');
+    					a.setAttribute('href','#');
+    					a.setAttribute('modelid',make.models[i].id);
+    					a.setAttribute('modelname',make.models[i].name);
+    					var txt = document.createTextNode(make.models[i].name);
+    					a.appendChild(txt);
+    					td.appendChild(a);
+    					var tr = table.rows[table.rows.length-1];
+    					tr.appendChild(td);
+    					cols++;
+    				}
+				}
+			}
+			
+			function showTab(n) {
+  				var x = document.getElementsByClassName("tab");
+  				x[n].style.display = "block";
+  				if (n == 0) {
+    				
+  				}
+  				if (n == (x.length - 1)) {
+    				
+  				} else {
+    				
+  				}
+  				var w = document.getElementById("div" + (n+1));
+  				w.classList.add("activestep1");
+  				// ... and run a function that displays the correct step indicator:
+			}
+			
+			function hideTab(n) {
+  				var x = document.getElementsByClassName("tab");
+  				x[n].style.display = "none";
+  				if (n == 0) {
+    				
+  				}
+  				if (n == (x.length - 1)) {
+    				
+  				} else {
+    				
+  				}
+  				var w = document.getElementById("div" + (n+1));
+  				w.classList.remove("activestep1");
+  				// ... and run a function that displays the correct step indicator:
+			}
+			
+			
+			
+			
+			//]]>
+	</h:outputScript>
+	<h:form id="form-1">
+		<!-- cart dialog -->
+		<div class="modal" id="myModal3" role="dialog">
+			<div class="container" width="500px;">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">#{lex.quotationOrder}</h4>
+						</div>
+						<div class="modal-body">
+							<ui:include
+								src="/_includes/templates/_home_cart_dialog_graphical_steps" />
+							<div class="tab">
+								<div class="well" style="text-align:center">
+									<table id="makes-table" class="table borderless">
+										<tbody id="makes-table-body">
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+							<div class="tab">
+								<div class="well" style="text-align:center">
+									<table id="models-table" class="table borderless">
+										<tbody id="models-table-body">
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+							<div class="tab">
+								<div class="well" style="text-align:center">
+									<table id="model-years-table" class="table borderless">
+										<tbody id="model-years-table-body">
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="tab" style="height: 220px;">
+								<div>
+									<div class="col-xs-12">
+										<div class="col-md-12 well text-center">
+											<p class="title-price">#{lex.enterVin}</p>
+											<p:tooltip id="toolTipContent" for="content" position="top"
+												styleClass="reg-image">
+												<p:graphicImage name="images/reg.jpg" styleClass="reg-image" />
+											</p:tooltip>
+											<h:outputLink id="content" value="#">
+												<i class="fa fa-question-circle" style="font-size: 15px;"></i>
+											</h:outputLink>
+											<div style="display: block; position: relative;">
+												<input id="vin" 
+												required="true"
+													type="text" 
+													name="vin" 
+													value="" 
+													class="form-control" 
+													style="text-transform: uppercase;margin: auto;"
+													maxlength="17" 
+													placeholder="#{lex.vin}">
+													</input>
+											
+												<h:inputText id="vin" value="#{autocartbean.cart.vin}"
+													rendered="false" requiredMessage="#{lex.enterVinReq}"
+													validatorMessage="#{lex.invalidVin2}"
+													a:placeHolder="#{lex.vin}" a:maxlength="17"
+													styleClass="form-control"
+													style="text-transform: uppercase;margin: auto;">
+													<f:validateRegex pattern="^[a-zA-Z0-9]*$"></f:validateRegex>
+												</h:inputText>
+											</div>
+
+											<p:message for="vin" id="vin-msg" style="height:10px;" />
+											<br />
+
+											<h:commandButton
+												actionListener="#{autocartbean.resetToStep(2)}"
+												value="#{lex.previous}" styleClass="btn">
+												<f:ajax execute="@this" render=":form-1:panel :form-1:step" />
+											</h:commandButton>
+
+											<h:commandButton actionListener="#{autocartbean.verifyVin()}"
+												value="#{lex.next}" styleClass="btn">
+												<f:ajax execute="@this :form-1:vin"
+													render="vin-msg vin :form-1:step" />
+											</h:commandButton>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</h:form>
+
+</ui:composition>

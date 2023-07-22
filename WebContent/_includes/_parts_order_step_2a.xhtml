@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+
+	<div class="col-lg-12">
+		<div id="endpayment">
+			<o:form id="form-3" styleClass="form-inline">
+				<p:panelGrid columns="2" styleClass="table" layout="grid">
+					<h:outputText value="#{lex.totalParts}" />
+					<h:outputText value="#{partsOrderBean.partOrder.newTotalPrice}"
+						style="font-weight: 600;">
+						<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+					</h:outputText>
+					<h:outputText value="#{lex.deliveryFees}" />
+					<h:outputText value="#{partsOrderBean.deliveryCharges}"
+						style="font-weight: 600;" id="del-fees">
+						<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+					</h:outputText>
+					<h:outputText value="#{lex.vat}" />
+					<h:outputText
+						value="#{(partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage)}"
+						style="font-weight: 600;" id="vat">
+						<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+					</h:outputText>
+					<h:outputText value="#{lex.total}" />
+					<h:outputText style="color: #cc4f1d; font-weight: 600;"
+						id="total-price"
+						value="#{(partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage) + partsOrderBean.deliveryCharges + partsOrderBean.partOrder.newTotalPrice}">
+						<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+					</h:outputText>
+					<h:outputText value="#{lex.address}" />
+					<h:inputText required="true" requiredMessage="Enter address"
+						styleClass="form-control" id="address1"
+						value="#{partsOrderBeans.cart.po.address.line1}">
+					</h:inputText>
+					<h:outputText value="#{lex.address}:" />
+					<h:inputText id="address2" styleClass="form-control"
+						value="#{partsOrderBeans.cart.po.address.line2}">
+					</h:inputText>
+					<h:outputText value="#{lex.city}" id="aa" />
+					<h:selectOneMenu requiredMessage="Select City"
+						styleClass="form-control" value="#{partsOrderBean.selectedCityId}"
+						required="true" id="cities">
+						<f:selectItems value="#{partsOrderBean.cities}" var="city"
+							itemValue="#{city.id}" itemLabel="#{city.nameAr}">
+						</f:selectItems>
+						<f:ajax />
+					</h:selectOneMenu>
+					<h:outputText value="#{lex.paymentMethod}" />
+					<h:selectOneMenu value="#{partsOrderBean.paymentMethod}"
+						id="payment" required="true" styleClass="form-control">
+						<f:selectItem itemValue="N" itemLabel="#{lex.selectPayment}" />
+						<f:selectItem itemValue="V" itemLabel="#{lex.visa}" />
+						<f:selectItem itemValue="M" itemLabel="#{lex.masterCard}" />
+						<f:selectItem itemValue="W" itemLabel="#{lex.wire}" />
+						<f:ajax execute="payment"
+							render="additional total-price del-fees msgs" />
+					</h:selectOneMenu>
+				</p:panelGrid>
+
+				<h:panelGroup id="additional">
+					<h:panelGroup rendered="#{partsOrderBean.cardPayment}">
+						<div align="center">
+							<h:graphicImage value="/resources/images/mastercard.png"
+								rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'M'}" />
+							<h:graphicImage value="/resources/images/visa.png"
+								rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'V'}" />
+						</div>
+						<br />
+						<p:panelGrid columns="2" layout="grid">
+							<h:outputText value="#{lex.cardNumber}" />
+							<h:inputText id="number"
+								value="#{partsOrderBean.localPayment.number}" required="true"
+								styleClass="form-control" a:maxlength="16">
+								<f:validateRegex pattern="#{partsOrderBean.regexCardNumber()}"></f:validateRegex>
+							</h:inputText>
+							<h:outputText value="#{lex.cardName}" />
+							<h:inputText value="#{partsOrderBean.localPayment.name}"
+								required="true" styleClass="form-control">
+							</h:inputText>
+							<h:outputText value="#{lex.expDate}" />
+							<h:panelGroup>
+								<h:outputText value="#{lex.expYear}" />
+								<h:selectOneMenu styleClass="form-control" required="true"
+									value="#{partsOrderBean.localPayment.year}">
+									<f:selectItems value="#{partsOrderBean.expiryDates}" var="year"
+										itemValue="#{year}" itemLabel="#{year}" />
+								</h:selectOneMenu>
+								<h:outputText value="#{lex.expMonth}" />
+								<h:selectOneMenu styleClass="form-control"
+									value="#{partsOrderBean.localPayment.month}">
+									<f:selectItems value="#{partsOrderBean.expiryMonths}"
+										var="month" itemValue="#{month}" itemLabel="#{month}" />
+								</h:selectOneMenu>
+							</h:panelGroup>
+							<h:outputText value="#{lex.cvc}" />
+							<h:inputText value="#{partsOrderBean.localPayment.cvc}"
+								required="true" styleClass="form-control">
+								<f:validateLongRange minimum="0" maximum="999"></f:validateLongRange>
+							</h:inputText>
+						</p:panelGrid>
+					</h:panelGroup>
+					<h:panelGroup rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'S'}">
+						<div align="center">
+							<h:graphicImage value="/resources/images/sadad.png"
+								style="width:100px" />
+						</div>
+						<br />
+						<p:panelGrid columns="2" layout="grid">
+							<h:outputText value="#{lex.sadadUsername}" />
+							<h:inputText value="#{partsOrderBeans.localPayment.name}"
+								required="true" styleClass="form-control" />
+						</p:panelGrid>
+					</h:panelGroup>
+				</h:panelGroup>
+
+				<br />
+				<div align="center">
+					<h:commandButton actionListener="#{partsOrderBean.next()}"
+						styleClass="btn" value="Checkout">
+						<f:ajax execute="@form" render="@all" />
+						<f:param name="order" value="#{partsOrderBean.cart.id}"></f:param>
+					</h:commandButton>
+					<p:messages id="msgs" />
+					<br /> <br />
+					<h:commandButton value="#{lex.previous}" styleClass="btn"
+						actionListener="#{partsOrderBean.previous()}">
+						<f:ajax execute="@this" render="@all"></f:ajax>
+						<f:param name="order" value="#{partsOrderBean.cart.id}"></f:param>
+					</h:commandButton>
+				</div>
+			</o:form>
+		</div>
+	</div>
+
+</ui:composition>

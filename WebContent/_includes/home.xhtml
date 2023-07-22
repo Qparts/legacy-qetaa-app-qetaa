@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<title>#{lex.title}</title>
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Raleway" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{resource['images/favicon.ico']}" />
+	<h:outputStylesheet library="css" name="bootstrap.css" />
+	<h:outputStylesheet library="css" name="style.css" />
+	<h:outputStylesheet library="css" name="page.css" />
+	<h:outputStylesheet library="css" name="hover.css" />
+	<h:outputStylesheet library="css" name="bootstrap-rtl.css" />
+	<h:outputScript library="js" name="bootstrap.min.js" />
+	<h:outputScript library="js" name="qit3.js" />
+	<meta name="author" content="qetaa.com" />
+	<meta name="email" content="info@qetaa.com" />
+	<meta charset="UTF-8" />
+</h:head>
+<h:body>
+	<ui:include src="/_includes/_customer_google_tag" />
+	<ui:include src="/_includes/_customer_top" />
+	<section id="account">
+		<ui:include src="/_includes/templates/_home_account_section" />
+	</section>
+	
+	<section id="pricing">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 text-center">
+				<h:commandButton
+					actionListener="#{autocartbean.resetToStep(autocartbean.step)}"
+					value="#{lex.startHere}" id="myBtn3"
+					class="btn btn-primary hvr-push">
+					<f:ajax />
+				</h:commandButton>
+			</div>
+		</div>
+	</div>
+	</section>
+
+
+
+	<section class="box">
+		<ui:include src="/_includes/templates/_home_step_graphics" />
+	</section>
+
+
+	<section class="box">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 text-center">
+				<h4 class="title-box">
+					<i class="fa fa-hourglass" aria-hidden="true"></i>#{lex.latestOrders}
+				</h4>
+
+				<div class="row">
+					<ui:include src="/_includes/templates/_home_last_static_orders" />
+				</div>
+
+				<section class="box">
+					<ui:include src="/_includes/templates/_home_contact_us" />
+				</section>
+			</div>
+		</div>
+	</div>
+	</section>
+	<footer> <ui:include src="/_includes/customer_footer" /> </footer>
+
+	<ui:include src="/_includes/templates/_home_order_complete_modal" />
+
+	<!-- login dialog -->
+	<ui:include src="/_includes/templates/_home_login_modal" />
+	<!-- register dialog -->
+	<ui:include src="/_includes/templates/_home_register_modal" />
+	<ui:include src="/_includes/templates/_home_cart_modal2" />
+	
+	<div class="w3-container">
+		<p:ajaxStatus onstart="PF('statusDialog').show()"
+			onsuccess="PF('statusDialog').hide()" />
+		<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false"
+			style="z-index:99999">
+			<p:graphicImage name="/images/ajax-loader.gif" />
+		</p:dialog>
+	</div>
+	<ui:include src="/_includes/_customer_chat" />
+</h:body>
+</html>

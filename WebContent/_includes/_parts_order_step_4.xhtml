@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<div align="center" class="paragraph-title">
+		<p>
+			<h:outputText value="#{lex.transferAmount}" />
+			<br />
+			<h:outputText rendered="#{not partsOrderBean.cart.promoCodeObject.discountPromo}"
+				value="#{partsOrderBean.partOrder.newTotalPrice  + partsOrderBean.cart.deliveryFees + (partsOrderBean.partOrder.newTotalPrice + partsOrderBean.cart.deliveryFees) * partsOrderBean.cart.vatPercentage}">
+				<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+			</h:outputText>
+			<h:outputText rendered="#{partsOrderBean.cart.promoCodeObject.discountPromo}"
+				value="#{((partsOrderBean.deliveryCharges * partsOrderBean.cart.vatPercentage) + (partsOrderBean.partOrder.newTotalPrice * partsOrderBean.cart.vatPercentage) + partsOrderBean.deliveryCharges + partsOrderBean.partOrder.newTotalPrice) - partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.deliveryCharges - partsOrderBean.cart.promoCodeObject.discountPercentage * partsOrderBean.partOrder.newTotalPrice}">
+				<f:convertNumber type="currency" currencySymbol="SR " locale="en_US"  />
+			</h:outputText>
+		</p>
+	</div>
+	<ui:include src="/_includes/_customer_bank_transfer.xhtml" />
+	<div align="center">
+		<p>
+			<h:outputLink value="/">#{lex.home}</h:outputLink>
+		</p>
+	</div>
+</ui:composition>

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<div style="margin-bottom: 20px;" />
+							<h:panelGroup id="step">
+								<div class="row step">
+									<div id="div1"
+										class="col-md-2 col-sm-2 col-xs-2 activestep1">
+										<i class="fa fa-car" aria-hidden="true"></i>
+										<p>#{lex.make}</p>
+									</div>
+									<div
+										id="div2"
+										class="col-md-2 col-sm-2 col-xs-2">
+										<i class="fa fa-bullseye" aria-hidden="true"></i>
+										<p>#{lex.model}</p>
+									</div>
+									<div id="div3"
+										class="col-md-2 col-sm-2 col-xs-2">
+										<i class="fa fa-calendar-o" aria-hidden="true"></i>
+										<p>#{lex.theYear}</p>
+									</div>
+									<div id="div4"
+										class="col-md-2 col-sm-2 col-xs-2">
+										<i class="fa fa-sort-numeric-asc" aria-hidden="true"></i>
+										<p>#{lex.theVin}</p>
+									</div>
+									<div id="div5"
+										class="col-md-2 col-sm-2 col-xs-2">
+										<i class="fa fa-columns" aria-hidden="true"></i>
+										<p>#{lex.theItems}</p>
+									</div>
+									<div id="div6"
+										class="col-md-2 col-sm-2 col-xs-2">
+										<i class="fa fa-paper-plane" aria-hidden="true"></i>
+										<p>#{lex.theOrder}</p>
+									</div>
+								</div>
+							</h:panelGroup>
+</ui:composition>
