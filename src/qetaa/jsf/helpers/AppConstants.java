@@ -7,7 +7,7 @@ public class AppConstants {
 	public final static String VIN_DIRECTORY_WINDOWS = "C:\\VIN-DIR\\";
 	public final static String VIN_DIRECTORY_LINUX = "/home/ubuntu/VIN-DIR/";
 	public final static String SERVICE_HOST = "http://localhost:8080";
-	public final static String APP_SECRET = "093X3b*y&iWu4U&F181X#3ZE0)%9374";
+	public final static String APP_SECRET = "secret2";
 	private final static String OS = System.getProperty("os.name").toLowerCase();
 	
 //	public final static String APP_HOST = "http://localhost:8081/jsf";
