@@ -72,17 +72,17 @@
 							- #{myCart.modelYear.model.nameAr} - #{myCart.modelYear.year}</div>
 						<div class="col-md-3 col-xs-6">
 							<h:outputText value="#{lex.underReview}"
-								rendered="#{(Character.toString(myCart.status) eq 'R') or (Character.toString(myCart.status) eq 'W') or (Character.toString(myCart.status) eq 'N')}" />
+								rendered="#{(myCart.status eq 'R'.charAt(0)) or (myCart.status eq 'W'.charAt(0)) or (myCart.status eq 'N'.charAt(0))}" />
 							<h:outputText value="#{lex.completed}"
-								rendered="#{Character.toString(myCart.status) eq 'S'}" />
+								rendered="#{myCart.status eq 'S'.charAt(0)}" />
 							<h:outputText value="#{lex.waitingForTransfer}"
-								rendered="#{Character.toString(myCart.status) eq 'T'}" />
+								rendered="#{myCart.status eq 'T'.charAt(0)}" />
 						</div>
 					</div>
 					<div class="col-md-10 col-md-offset-1 col-xs-12 border">
 						<div class="row">
 							<h:panelGroup
-								rendered="#{Character.toString(myCart.status) eq 'N' or Character.toString(myCart.status) eq 'W' or Character.toString(myCart.status) eq 'Q' or Character.toString(myCart.status) eq 'R'}">
+								rendered="#{myCart.status eq 'N'.charAt(0) or myCart.status eq 'W'.charAt(0) or myCart.status eq 'Q'.charAt(0) or myCart.status eq 'R'.charAt(0)}">
 								<div align="center">
 									<br />
 									<h:outputText value="#{lex.orderUnderReview}"
@@ -109,7 +109,7 @@
 
 								</div>
 							</h:panelGroup>
-							<h:panelGroup rendered="#{Character.toString(myCart.status) eq 'T'}">
+							<h:panelGroup rendered="#{myCart.status eq 'T'.charAt(0)}">
 								<div align="center" class="paragraph-title">
 									<p>
 										<h:outputText value="#{lex.transferAmount}" />
@@ -130,7 +130,7 @@
 								</div>
 								<ui:include src="/_includes/_customer_bank_transfer" />
 							</h:panelGroup>
-							<h:panelGroup rendered="#{Character.toString(myCart.status) eq 'S'}">
+							<h:panelGroup rendered="#{myCart.status eq 'S'.charAt(0)}">
 								<div class="paragraph-title" align="center">#{lex.quotation}</div>
 								<table
 									class="table table-striped table-bordered table-hover table-condensed">
@@ -209,7 +209,7 @@
 
 								<div class="col-xs-12 text-center">
 									<br />
-									<h:outputLink rendered="#{Character.toString(myCart.status) eq 'S'}"
+									<h:outputLink rendered="#{myCart.status eq 'S'.charAt(0)}"
 										value="parts_order?order=#{myCart.id}"
 										class="btn btn-primary hvr-push">
 										<h:outputText value="#{lex.orderPartsFromQuotation}" />

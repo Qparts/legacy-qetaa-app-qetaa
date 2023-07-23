@@ -66,9 +66,9 @@
 					<h:panelGroup rendered="#{partsOrderBean.cardPayment}">
 						<div align="center">
 							<h:graphicImage value="/resources/images/mastercard.png"
-								rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'M'}" />
+								rendered="#{partsOrderBean.paymentMethod eq 'M'.charAt(0)}" />
 							<h:graphicImage value="/resources/images/visa.png"
-								rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'V'}" />
+								rendered="#{partsOrderBean.paymentMethod eq 'V'.charAt(0)}" />
 						</div>
 						<br />
 						<p:panelGrid columns="2" layout="grid">
@@ -104,7 +104,7 @@
 							</h:inputText>
 						</p:panelGrid>
 					</h:panelGroup>
-					<h:panelGroup rendered="#{Character.toString(partsOrderBean.paymentMethod) eq 'S'}">
+					<h:panelGroup rendered="#{partsOrderBean.paymentMethod eq 'S'.charAt(0)}">
 						<div align="center">
 							<h:graphicImage value="/resources/images/sadad.png"
 								style="width:100px" />

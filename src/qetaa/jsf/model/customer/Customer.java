@@ -19,17 +19,17 @@ public class Customer implements Serializable {
 	private String password;//hashed password
 	private int createdBy;
 	private Integer countryId;
-	
 
-	
+	private List<LoyaltyPoints> loyaltyPoints;
+
+
 	public Integer getCountryId() {
 		return countryId;
 	}
 	public void setCountryId(Integer countryId) {
 		this.countryId = countryId;
 	}
-	private List<LoyaltyPoints> loyaltyPoints;
-	
+
 	public List<LoyaltyPoints> getLoyaltyPoints() {
 		return loyaltyPoints;
 	}

@@ -10,9 +10,9 @@ public class AppConstants {
 	public final static String APP_SECRET = "secret2";
 	private final static String OS = System.getProperty("os.name").toLowerCase();
 	
-//	public final static String APP_HOST = "http://localhost:8081/jsf";
-	//public final static String APP_HOST_UNSECURE = "http://localhost:8081/jsf";
-	//public final static String HOST_ESCAPED = "http%3A%2F%2Flocalhost:8081%2Fjsf%2F";
+//	public final static String APP_HOST = "http://localhost:8080/jsf";
+	//public final static String APP_HOST_UNSECURE = "http://localhost:8080/jsf";
+	//public final static String HOST_ESCAPED = "http%3A%2F%2Flocalhost:8080%2Fjsf%2F";
 	
 	//for server
 	public final static String APP_HOST = "http://52.54.251.161:8080/";
