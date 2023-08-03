@@ -31,10 +31,10 @@
 						<h:panelGroup>
 							<h:outputText value="Status" />
 							<br />
-							<h:outputText value="Preparing Order" rendered="#{Character.toString(cart.status) eq 'P'}" />
+							<h:outputText value="Preparing Order" rendered="#{cart.status eq 'P'.charAt(0)}" />
 							<h:outputText value="Collecting Items"
-								rendered="#{(cart.status eq 'V') or (Character.toString(cart.status) eq 'E')}" />
-							<h:outputText value="Order Shipped" rendered="#{Character.toString(cart.status) eq 'H' or Character.toString(cart.status) eq 'F'}" />
+								rendered="#{(cart.status eq 'V'.charAt(0)) or (cart.status eq 'E'.charAt(0))}" />
+							<h:outputText value="Order Shipped" rendered="#{cart.status eq 'H'.charAt(0) or cart.status eq 'F'.charAt(0)}" />
 						</h:panelGroup>
 					</h:panelGrid>
 				</div>
@@ -139,7 +139,7 @@
 						</h:dataTable>
 					</div>
 					<div align="center">
-						<h:outputLink rendered="#{Character.toString(cart.status) eq 'S'}"
+						<h:outputLink rendered="#{cart.status eq 'S'.charAt(0)}"
 							value="parts_order?order=#{cart.cartId}">
 											Order Parts
 										</h:outputLink>

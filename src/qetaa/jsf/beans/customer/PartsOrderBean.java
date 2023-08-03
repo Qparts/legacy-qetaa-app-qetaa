@@ -3,7 +3,9 @@ package qetaa.jsf.beans.customer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +20,7 @@ import qetaa.jsf.helpers.AppConstants;
 import qetaa.jsf.helpers.Bundler;
 import qetaa.jsf.helpers.CreditCard;
 import qetaa.jsf.helpers.Helper;
+import qetaa.jsf.helpers.PojoRequester;
 import qetaa.jsf.model.cart.ApprovedQuotationItem;
 import qetaa.jsf.model.cart.Cart;
 import qetaa.jsf.model.cart.PartsOrder;
@@ -29,6 +32,7 @@ import qetaa.jsf.model.payment.PartsPayment;
 import qetaa.jsf.model.payment.PaymentResponseCC;
 import qetaa.jsf.model.payment.PaymentResponseSadad;
 import qetaa.jsf.model.promotion.PromotionCode;
+import qetaa.jsf.model.vehicle.ModelYear;
 
 @Named(value = "partsOrderBean")
 @SessionScoped
@@ -52,18 +56,19 @@ public class PartsOrderBean implements Serializable {
 	private boolean failed;
 	private boolean promVerified;
 	private String promCodeString;
+	private int additionalDelivery;
 
 	@Inject
 	private Requester reqs;
 	@Inject
 	private LoginBean loginBean;
 	@Inject
-	private MyOrdersBean myOrderBean;
-	@Inject
 	private ActivityMonitorBean monitorBean;
 
 	public void init() {
 		try {
+			paymentMethod = 'N';
+			this.updateDelivery();
 			String s = Helper.getParam("order");
 			Long cartId = Long.parseLong(s);
 			if (s != null) {
@@ -74,7 +79,6 @@ public class PartsOrderBean implements Serializable {
 					initCart(cartId);
 					initCartVariables();
 					initBean();
-
 				}
 			} else {
 				throw new Exception();
@@ -87,15 +91,42 @@ public class PartsOrderBean implements Serializable {
 	}
 
 	private void initCartVariables() {
-		for (Cart c : myOrderBean.getCarts()) {
-			if (c.getId() == this.cart.getId()) {
-				cart.setCity(c.getCity());
-				cart.setModelYear(c.getModelYear());
-				cart.setApprovedItems(c.getApprovedItems());
-				cart.setCustomer(c.getCustomer());
-				initPartsHolder();
-				break;
-			}
+		String header = reqs.getSecurityHeader();
+		initCity(cart, header);
+		initModelYear(cart, header);
+		initApprovedItems(cart, header);
+		cart.setCustomer(loginBean.getAccess().getCustomer());
+		initPartsHolder();
+	}
+
+	private void initApprovedItems(Cart cart, String header) {
+		String link = "";
+		if (cart.getStatus() == 'T') {
+			link = AppConstants.getCustomerPartsApprovedITems(cart.getId());
+		} else {
+			link = AppConstants.getCustomerApprovedItems(cart.getId());
+		}
+		Response r = PojoRequester.getSecuredRequest(link, header);
+		if (r.getStatus() == 200) {
+			List<ApprovedQuotationItem> approved = r.readEntity(new GenericType<List<ApprovedQuotationItem>>() {
+			});
+			cart.setApprovedItems(approved);
+		}
+	}
+
+	private void initModelYear(Cart cart, String header) {
+		Response r = PojoRequester.getSecuredRequest(AppConstants.getModelYear(cart.getVehicleYear()), header);
+		if (r.getStatus() == 200) {
+			ModelYear modelYear = r.readEntity(ModelYear.class);
+			cart.setModelYear(modelYear);
+		}
+	}
+
+	private void initCity(Cart cart, String header) {
+		Response r = PojoRequester.getSecuredRequest(AppConstants.getCity(cart.getCityId()), header);
+		if (r.getStatus() == 200) {
+			City city = r.readEntity(City.class);
+			cart.setCity(city);
 		}
 	}
 
@@ -161,12 +192,20 @@ public class PartsOrderBean implements Serializable {
 
 	}
 
-	private void preparePartsOrder(Long pid) {
+	private void preparePartsOrder2(Long pid) {
 		// prepare address
 		partOrder.setCartId(this.cart.getId());
 		partOrder.setSalesAmount(grandTotal());
 		partOrder.adjustFinalQuantity();
 		partOrder.setPaymentId(pid);
+		partOrder.setAddress(this.address);
+	}
+
+	private void preparePartsOrder() {
+		// prepare address
+		partOrder.setCartId(this.cart.getId());
+		partOrder.setSalesAmount(grandTotal());
+		partOrder.adjustFinalQuantity();
 		partOrder.setAddress(this.address);
 	}
 
@@ -192,6 +231,7 @@ public class PartsOrderBean implements Serializable {
 	}
 
 	public void next() {
+		System.out.println(step);
 		if (step == 1) {
 			monitorBean.addToActivity("clicked next on parts order: " + cart.getId());
 			if (partOrder.getNewTotalPrice() > 0) {
@@ -219,7 +259,8 @@ public class PartsOrderBean implements Serializable {
 					monitorBean.addToActivity("making wire transfer request");
 					makeWireTransferRequest();
 				} else if (this.paymentMethod == 'D') {
-					// on delivery
+					monitorBean.addToActivity("cash on delivery request");
+					makeCashOnDeliveryRequest();
 					// send to quotation service to update cart status as on delivery payment.
 					// this should require user to aprove after calling the customer
 
@@ -278,11 +319,10 @@ public class PartsOrderBean implements Serializable {
 	private void makeWireTransferRequest() {
 		Response r = reqs.putSecuredRequest(AppConstants.PUT_UPDATE_CART, cart);
 		if (r.getStatus() == 201) {
-			preparePartsOrder(0L);
+			preparePartsOrder2(0L);
 			Response r2 = reqs.postSecuredRequest(AppConstants.POST_WIRE_TRASNFER, partOrder);
 			if (r2.getStatus() == 201) {
 				monitorBean.addToActivity("successful wire transfer request");
-				myOrderBean.init();
 				this.cart.setStatus('T');
 				step = 4;
 			} else {
@@ -348,6 +388,9 @@ public class PartsOrderBean implements Serializable {
 		this.localPayment.setAmount(getGrandTotal());
 		this.localPayment
 				.setCallback(AppConstants.APP_HOST + "payment_response?order=" + cart.getId() + "&type=" + 'C');
+		// this.localPayment
+		 //.setCallback("http://localhost:8081/" + "payment_response?order=" +
+		 //cart.getId() + "&type=" + 'C');
 
 		this.localPayment.setCartId(cart.getId());
 		this.localPayment.setPaymentIndex(1);
@@ -363,7 +406,90 @@ public class PartsOrderBean implements Serializable {
 		}
 	}
 
+	private void makeCashOnDeliveryRequest() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		preparePartsOrder();
+		cart.setDeliveryFees(this.getDeliveryCharges());
+		map.put("partsOrder", partOrder);
+		map.put("cart", cart);
+		map.put("discountPercentage", getCalculatedDiscountPercentage());
+		map.put("customerName",
+				this.getCart().getCustomer().getFirstName() + " " + this.getCart().getCustomer().getLastName());
+		Response r2 = reqs.postSecuredRequest(AppConstants.POST_CREATE_PARTS_ORDER_COD, map);
+		if (r2.getStatus() == 201) {
+			cart.setStatus('P');
+			System.out.println("cash on delivery created");
+			step = 5;
+		}
+	}
+
 	public void processPaymentResponse() {
+		try {
+			monitorBean.addToActivity("received response from credit card payment");
+			String paymentId = Helper.getParam("id");// some string
+			String status = Helper.getParam("status");// paid , failed
+			String typeString = Helper.getParam("type");// C , S (creditCard or sadad).;
+			if (status.equals("paid")) {
+				monitorBean.addToActivity("successful payment at credit card, payment id: " + paymentId);
+				failed = false;
+				if (typeString.equals("C")) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					preparePartsOrder();
+					map.put("partsOrder", partOrder);
+					map.put("cart", cart);
+					String ccCompany = "";
+					if (this.paymentMethod == 'V') {
+						ccCompany = "visa";
+					} else if (this.paymentMethod == 'M') {
+						ccCompany = "mastercard";
+					}
+					map.put("ccCompany", ccCompany);
+					map.put("discountPercentage", getCalculatedDiscountPercentage());
+					map.put("customerName", this.getCart().getCustomer().getFirstName() + " "
+							+ this.getCart().getCustomer().getLastName());
+					map.put("gateway", "Moyassar");
+					map.put("transactionId", paymentId);
+					Double fees = (getGrandTotal() * 0.024) + 1;
+					map.put("creditFees", fees);
+					Response r = reqs.postSecuredRequest(AppConstants.POST_CREATE_PARTS_ORDER_CC, map);
+					if (r.getStatus() == 201) {
+						cart.setStatus('P');
+						System.out.println("paid and successfully processed " + localPayment);
+						step = 3;
+						Helper.redirect("parts_order?order=" + this.cart.getId());
+					} else {
+						cart.setStatus('P');
+						step = 3;
+						System.out.println("paid but failed to process " + localPayment);
+						monitorBean.addToActivity("failed to created wallet, but credit card created " + paymentId);
+						Helper.redirect("parts_order?order=" + this.cart.getId());
+						// parts paid but there is a problem in creating part!
+						// save the error and proceed normally but fix at the backend
+					}
+				}
+			} else if (status.equals("failed")) {
+				monitorBean.addToActivity("failed credit card payment");
+				failed = true;
+				Helper.addErrorMessage("لم تتم عملية الدفع بنجاح, الرجاء المحاولة مرة اخرى");
+				Helper.redirect("parts_order?order=" + this.cart.getId());
+				// do not proceed.
+			}
+
+		} catch (Exception ex) {
+
+		}
+	}
+
+	private double getCalculatedDiscountPercentage() {
+		if (this.getCart().getPromoCodeObject() != null) {
+			if (this.getCart().getPromoCodeObject().isDiscountPromo()) {
+				return this.getCart().getPromoCodeObject().getDiscountPercentage();
+			}
+		}
+		return 0;
+	}
+
+	public void processPaymentResponse2() {
 		try {
 			monitorBean.addToActivity("received response from credit card payment");
 			String paymentId = Helper.getParam("id");// some string
@@ -375,26 +501,23 @@ public class PartsOrderBean implements Serializable {
 				monitorBean.addToActivity("successful payment at credit card, payment id: " + paymentId);
 				failed = false;
 				if (typeString.equals("C")) {
+					//
 					PartsPayment payment = new PartsPayment(creditResponse, cart, paymentId);
 					Response r = reqs.postSecuredRequest(AppConstants.POST_PARTS_PAYMENT_FINALIZE, payment);
 					if (r.getStatus() == 200) {
 						// get payment id;
 						Long pId = r.readEntity(Long.class);
 						// create part order
-						preparePartsOrder(pId);
+						preparePartsOrder2(pId);
 						Response r2 = reqs.postSecuredRequest(AppConstants.CUSTOMER_CREATE_PARTS_ORDER, this.partOrder);
 						if (r2.getStatus() == 201) {
 							this.cart.setStatus('P');
-							myOrderBean.init();
 							System.out.println("paid and successfully processed " + localPayment);
 							step = 3;
-							Helper.redirect("/parts_order?order=" + cart.getId());
 						} else {
-							myOrderBean.init();
 							this.cart.setStatus('P');
 							step = 3;
 							System.out.println("paid but failed to process " + localPayment);
-							Helper.redirect("/parts_order?order=" + cart.getId());
 							// parts paid but there is a problem in creating part!
 							// save the error and proceed normally but fix at the backend
 						}
@@ -403,7 +526,6 @@ public class PartsOrderBean implements Serializable {
 						// log its important!! because payment was made but was not processed!!!
 						System.out.println("paid but failed to process " + localPayment);
 						this.cart.setStatus('P');
-						Helper.redirect("/parts_order?order=" + cart.getId());
 						// parts paid but there is a problem in saving the payment
 						// save the error and proceed normally but fix at the backend
 					}
@@ -411,7 +533,6 @@ public class PartsOrderBean implements Serializable {
 			} else if (status.equals("failed")) {
 				monitorBean.addToActivity("failed credit card payment");
 				failed = true;
-				Helper.redirect("/parts_order?order=" + cart.getId());
 				Helper.addErrorMessage("لم تتم عملية الدفع بنجاح, الرجاء المحاولة مرة اخرى");
 				// do not proceed.
 			}
@@ -419,9 +540,16 @@ public class PartsOrderBean implements Serializable {
 		} catch (Exception ex) {
 			monitorBean.addToActivity("failed credit card payment");
 			failed = true;
-			Helper.redirect("/parts_order?order=" + cart.getId());
 			Helper.addErrorMessage("لم تتم عملية الدفع بنجاح, الرجاء المحاولة مرة اخرى");
 			// redirect to partsOrder and show an error
+		}
+	}
+
+	public void updateDelivery() {
+		if (this.paymentMethod == 'D') {
+			this.additionalDelivery = 30;
+		} else {
+			this.additionalDelivery = 0;
 		}
 	}
 
@@ -473,13 +601,8 @@ public class PartsOrderBean implements Serializable {
 		}
 	}
 
-	public double getDeliveryCharges() {
-		switch (this.paymentMethod) {
-		case 'D':
-			return this.cart.getDeliveryFees() + 20D;
-		default:
-			return this.cart.getDeliveryFees();
-		}
+	public Integer getDeliveryCharges() {
+		return this.cart.getDeliveryFees() + this.additionalDelivery;
 	}
 
 	public Cart getCart() {

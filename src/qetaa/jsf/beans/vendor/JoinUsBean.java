@@ -51,7 +51,6 @@ public class JoinUsBean implements Serializable{
 	
 	public void addNewVendor() {
 		Response r = reqs.postSecuredRequest(AppConstants.POST_JOIN_US, this.joinUs);
-		System.out.println(r.getStatus());
 		reset();
 		submitted = true;
 		

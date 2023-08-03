@@ -19,7 +19,7 @@ public class NotLoggedRequester implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	public String getSecurityHeader() {
-		return "Bearer no-token && no_id && " + AppConstants.APP_SECRET + " && " + "C";// from customer
+		return "Bearer no-token && no_id && " + AppConstants.APP_SECRET + " && " + "V";// from customer
 	}
 	
 	public Response getSecuredRequest(String link) {

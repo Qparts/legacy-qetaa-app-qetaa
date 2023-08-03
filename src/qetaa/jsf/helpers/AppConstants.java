@@ -15,9 +15,9 @@ public class AppConstants {
 	//public final static String HOST_ESCAPED = "http%3A%2F%2Flocalhost:8080%2Fjsf%2F";
 	
 	//for server
-	public final static String APP_HOST = "http://52.54.251.161:8080/";
-	public final static String APP_HOST_UNSECURE = "http://52.54.251.161:8080/";
-	public final static String HOST_ESCAPED = "http://52.54.251.161:8080/";
+	public final static String APP_HOST = "http://157.175.161.41:8080/";
+	public final static String APP_HOST_UNSECURE = "http://157.175.161.41:8080/";
+	public final static String HOST_ESCAPED = "http://157.175.161.41:8080/";
 	
 	//===============SERVICES=================//
 	private final static String CUSTOMER_SERVICE = SERVICE_HOST + "/service-qetaa-customer/rest/";
@@ -58,17 +58,22 @@ public class AppConstants {
 	
 	//===============CARTS=================//
 	public final static String POST_CREATE_CART = CART_SERVICE + "cart";
-	public final static String PUT_UPDATE_CART = CART_SERVICE + "cart";  
+	public final static String PUT_UPDATE_CART = CART_SERVICE + "cart";
+	public final static String PUT_ARCHIVE_CART = CART_SERVICE + "archive-cart/customer";
 	//===============PARTS=================//
 	public final static String POST_WIRE_TRASNFER = CART_SERVICE + "wire-transfer";
 	public final static String POST_PARTS_PAYMENT_MAYASAR = PAYMENT_SERVICE_MOYASAR + "payment-request";
 	public final static String POST_PARTS_PAYMENT_FINALIZE = PAYMENT_SERVICE+ "save-successful-payment/customer";
+	
 	public final static String CUSTOMER_CREATE_PARTS_ORDER = CART_SERVICE + "parts-order";
+	public final static String POST_CREATE_PARTS_ORDER_CC = CART_SERVICE + "parts-order/credit-card";
+	public final static String POST_CREATE_PARTS_ORDER_COD = CART_SERVICE + "parts-order/cash-on-delivery";
 	public final static String CUSTOMER_GET_ACTIVE_BANKS = PAYMENT_SERVICE_BANKS + "active-banks/customer";
 	
 	public final static String POST_HIT_COUNTER = CUSTOMER_SERVICE + "hit";
 	public final static String POST_HIT_ACTIVITIES = CUSTOMER_SERVICE + "hit-activities";
 	public final static String GET_NEW_VISIT_INDEX = CUSTOMER_SERVICE + "new-visit-index";
+	
 	
 	public final static String USER_MATCH_TOKEN = USER_SERVICE + "match-token";
 	
@@ -150,6 +155,14 @@ public class AppConstants {
 	
 	public final static String getPromoCode(long promoCodeId) {
 		return PROMOTION_SERVICE  + "promotion-code/" + promoCodeId;
+	}
+	
+	public final static String getVisibleReview(long cartId) {
+		return CART_SERVICE  + "reviews/visible/" + cartId;
+	}
+	
+	public final static String getCartStatus(long cartId) {
+		return CART_SERVICE + "cart-status/" + cartId;
 	}
 	
 }

@@ -108,7 +108,7 @@
 		<br/>
 			<h:commandButton value="#{lex.next}" styleClass="btn"
 				actionListener="#{partsOrderBean.next()}">
-				<f:ajax execute="@form" render="@all"></f:ajax>
+				<f:ajax execute="@form" render=":steps-panel @form"/>
 				<f:param name="order" value="#{partsOrderBean.cart.id}"></f:param>
 			</h:commandButton>
 		</div>

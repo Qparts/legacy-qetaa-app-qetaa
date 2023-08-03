@@ -1057,8 +1057,8 @@
 												actionListener="#{autocartbean.submit()}" id="submit"
 												value="#{lex.submitOrder}"
 												disabled="#{((not (autocartbean.agree)) or (autocartbean.selectedRegionId eq 0)) or (not autocartbean.promCodeVerifiedAll)}"
-												styleClass="btn btn-primary hvr-push">
-												<f:ajax execute="@form" render="@all :complete" />
+												styleClass="btn btn-primary hvr-push" onclick="$('#myModal3').modal('toggle');PF('statusDialog').hide();">
+												<f:ajax execute="@form" render="@form :complete" />
 											</h:commandButton>
 											<br />
 										</div>

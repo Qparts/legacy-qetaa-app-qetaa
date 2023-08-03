@@ -18,7 +18,7 @@
 				</div>
 
 				<h:form id="form-register-main">
-					<h:panelGroup rendered="#{Character.toString(loginBean.loginStatus) eq 'N'}">
+					<h:panelGroup rendered="#{loginBean.loginStatus eq 'N'.charAt(0)}">
 						<div class="modal-body">
 
 							<div align="center" class="col-xs-12">
@@ -50,7 +50,7 @@
 				<h:form id="form-register-email"
 					styleClass="form-horizontal pageform">
 					<h:panelGroup
-						rendered="#{Character.toString(loginBean.loginStatus) eq 'R' and Character.toString(loginBean.loginMechanism) eq 'E'}">
+						rendered="#{loginBean.loginStatus eq 'R'.charAt(0) and loginBean.loginMechanism eq 'E'.charAt(0)}">
 						<div class="modal-body">
 							<div>
 								<h:messages />
@@ -180,7 +180,7 @@
 				<h:form id="form-register-facebook"
 					styleClass="form-horizontal pageform">
 					<h:panelGroup
-						rendered="#{Character.toString(loginBean.loginStatus) eq 'R' and Character.toString(loginBean.loginMechanism) eq 'F'}">
+						rendered="#{loginBean.loginStatus eq 'R'.charAt(0) and loginBean.loginMechanism eq 'F'.charAt(0)}">
 						<div class="modal-body">
 							<div>
 								<h:messages style="color:red" />

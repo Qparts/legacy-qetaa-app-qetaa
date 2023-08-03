@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.GenericType;
@@ -16,11 +16,12 @@ import qetaa.jsf.helpers.AppConstants;
 import qetaa.jsf.helpers.PojoRequester;
 import qetaa.jsf.model.cart.ApprovedQuotationItem;
 import qetaa.jsf.model.cart.Cart;
+import qetaa.jsf.model.cart.CartReview;
 import qetaa.jsf.model.location.City;
 import qetaa.jsf.model.promotion.PromotionCode;
 
 @Named(value = "pastOrdersBean")
-@SessionScoped
+@ViewScoped
 public class PastOrdersBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -56,8 +57,20 @@ public class PastOrdersBean implements Serializable {
 			initCity(cart, header);
 			initApprovedItems(cart, header);
 			initPromo(cart, header);
+			initReviews(cart, header);
 		}
-
+	}
+	
+	private void initReviews(Cart cart, String header) {
+		try {
+			Response r = PojoRequester.getSecuredRequest(AppConstants.getVisibleReview(cart.getId()), header);
+			if(r.getStatus() == 200) {
+				List<CartReview> reviews = r.readEntity(new GenericType<List<CartReview>>() {});
+				cart.setReviews(reviews);
+			}
+		}catch(Exception ex) {
+			cart.setReviews(new ArrayList<>());
+		}
 	}
 
 	private void initApprovedItems(Cart cart, String header) {

@@ -11,7 +11,16 @@ public class CartItem implements Serializable{
 	private int quantity, createdBy;
 	private String name;
 	private Date created;
+	private boolean imageAttached;
 	
+	
+	
+	public boolean isImageAttached() {
+		return imageAttached;
+	}
+	public void setImageAttached(boolean imageAttached) {
+		this.imageAttached = imageAttached;
+	}
 	public long getId() {
 		return id;
 	}

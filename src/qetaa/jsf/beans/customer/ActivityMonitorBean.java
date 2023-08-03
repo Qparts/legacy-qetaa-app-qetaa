@@ -63,7 +63,6 @@ public class ActivityMonitorBean implements Serializable {
 			Response r = PojoRequester.getSecuredRequest(AppConstants.GET_NEW_VISIT_INDEX, header);
 			if (r.getStatus() == 200) {
 				this.visitIndex = r.readEntity(Long.class);
-				System.out.println("new visit index " + visitIndex);
 				saveVisitIndexCookie();
 			} else {
 				System.out.println("could not get visit index");

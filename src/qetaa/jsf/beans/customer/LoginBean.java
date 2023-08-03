@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.primefaces.context.RequestContext;
+import org.primefaces.PrimeFaces;
 
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
@@ -175,12 +175,37 @@ public class LoginBean implements Serializable {
 			this.loginStatus = 'A';
 			saveCookie();
 			doLogin();
-			Helper.redirect("/my_orders");
+			//check cart status
+			char c = getCartStatus();
+			String link = "";
+			switch(c) {
+				case 'N':
+				case 'Q':
+				case 'W':
+				case 'R':
+				case 'A':
+				case 'S':
+					link = "/my_orders";
+					break;
+				default:
+					link = "/past_orders";
+					
+			}
+			String anchor = "#c" +access.getCartId();
+			Helper.redirect(link + anchor);
 		} else {
 			monitorBean.addToActivity("invalid code login");
 			Helper.redirect("/index");
 		}
-
+	}
+	
+	private char getCartStatus() {
+		Response r = reqs.getSecuredRequest(AppConstants.getCartStatus(access.getCartId()));
+		if(r.getStatus() == 200) {
+			Character c = r.readEntity(Character.class);
+			return c.charValue();
+		}
+		return 'W';
 	}
 
 	public void chooseEmailRegistration() {
@@ -406,9 +431,9 @@ public class LoginBean implements Serializable {
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.getExternalContext().getSessionMap().put("customer.access", access);
 		if (autoCartBean.getStep() == 5) {
-			RequestContext.getCurrentInstance().execute("resetActive(" + autoCartBean.getProgressPercentage() + ", '"
+			PrimeFaces.current().executeScript("resetActive(" + autoCartBean.getProgressPercentage() + ", '"
 					+ autoCartBean.getProgressStepName() + "');");
-			RequestContext.getCurrentInstance().execute("showCartDialog()");
+			PrimeFaces.current().executeScript("showCartDialog()");
 		}
 	}
 

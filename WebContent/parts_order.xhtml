@@ -17,7 +17,7 @@
 	<meta charset="UTF-8" name="viewport"
 		content="width=device-width, initial-scale=1" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="description" content="#{lex.metaDesc}"/>
+	<meta name="description" content="#{lex.metaDesc}" />
 	<link rel="shortcut icon" type="image/x-icon"
 		href="#{resource['images/favicon.ico']}" />
 	<h:outputStylesheet library="css" name="bootstrap.css" />
@@ -53,17 +53,22 @@
 					<div class="paragraph-title">#{lex.orderNumber} :
 						#{partsOrderBean.cart.id}</div>
 				</div>
-				<h:panelGroup rendered="#{partsOrderBean.step eq 1}">
-					<ui:include src="/_includes/_parts_order_step_1.xhtml" />
-				</h:panelGroup>
-				<h:panelGroup rendered="#{partsOrderBean.step eq 2}">
-					<ui:include src="/_includes/_parts_order_step_2" />
-				</h:panelGroup>
-				<h:panelGroup rendered="#{partsOrderBean.step eq 3}">
-					<ui:include src="/_includes/_parts_order_step_3.xhtml" />
-				</h:panelGroup>
-				<h:panelGroup rendered="#{partsOrderBean.step eq 4}">
-					<ui:include src="/_includes/_parts_order_step_4.xhtml" />
+				<h:panelGroup id="steps-panel">
+					<h:panelGroup rendered="#{partsOrderBean.step eq 1}">
+						<ui:include src="/_includes/_parts_order_step_1" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{partsOrderBean.step eq 2}">
+						<ui:include src="/_includes/_parts_order_step_2" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{partsOrderBean.step eq 3}">
+						<ui:include src="/_includes/_parts_order_step_3" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{partsOrderBean.step eq 4}">
+						<ui:include src="/_includes/_parts_order_step_4" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{partsOrderBean.step eq 5}">
+						<ui:include src="/_includes/_parts_order_step_5" />
+					</h:panelGroup>
 				</h:panelGroup>
 
 			</div>

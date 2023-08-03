@@ -87,6 +87,10 @@ function showCompleteDialog() {
 	$("#completeModal").modal();
 }
 
+function hideModal3(){
+	$("#myModal3").modal("toggle");
+}
+
 function showCartDialog() {
 	$("#myModal3").modal();
 }

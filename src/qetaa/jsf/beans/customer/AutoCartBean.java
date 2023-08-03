@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.primefaces.context.RequestContext;
+import org.primefaces.PrimeFaces;
 
 import qetaa.jsf.beans.reqs.NotLoggedRequester;
 import qetaa.jsf.beans.reqs.Requester;
@@ -211,7 +211,6 @@ public class AutoCartBean implements Serializable {
 	
 	public void verifyPromCode() {
 		Response r = reqs.getSecuredRequest(AppConstants.getPromotionCodeFromCode(this.promCodeString));
-		System.out.println(r.getStatus());
 		if(r.getStatus() == 200) {
 			this.promVerified = true;
 			this.cart.setPromotionCode(r.readEntity(Integer.class));
@@ -240,6 +239,8 @@ public class AutoCartBean implements Serializable {
 		}
 		// get saudi arabia cities only
 	}
+	
+	
 
 	public void submit() {
 		monitorBean.addToActivity("chose city: " + cart.getCityId());
@@ -257,9 +258,9 @@ public class AutoCartBean implements Serializable {
 			ci.setName(ci.getName().trim());
 		}
 		Response r = reqs.postSecuredRequest(AppConstants.POST_CREATE_CART, cart);
-		System.out.println("received back " + r.getStatus());
 		if (r.getStatus() == 200) {
 			this.lastOrderId = r.readEntity(Long.class);
+			PrimeFaces.current().executeScript("showCompleteDialog()");
 			monitorBean.addToActivity("successful order submitted: " + lastOrderId);
 			if(this.vinImageUploaded) {
 				try {
@@ -272,9 +273,8 @@ public class AutoCartBean implements Serializable {
 			}
 			this.lastNoVin = cart.isNoVin();
 			init();
-			myOrdersBean.init();
-			RequestContext.getCurrentInstance().execute("document.getElementById('form-1:vin-img').value = '';");
-			RequestContext.getCurrentInstance().execute("showCompleteDialog()");
+			
+			PrimeFaces.current().executeScript("document.getElementById('form-1:vin-img').value = '';"); 		
 			
 		} else if (r.getStatus() == 429) {
 			// log too many requests
@@ -314,15 +314,15 @@ public class AutoCartBean implements Serializable {
 	public void verifyItems() {
 		if (cart.getCartItems().size() == 0) {
 			monitorBean.addToActivity("clicked next but no items added");
-			RequestContext.getCurrentInstance().execute("resetActive(80, 'step-5');");
-			RequestContext.getCurrentInstance().update("form-1:item-msg");
+			PrimeFaces.current().executeScript("resetActive(80, 'step-5');");
+			PrimeFaces.current().ajax().update("form-1:item-msg");
 			Helper.addErrorMessage(Bundler.getValue("addItemsReq"));
 		} else {
 			for (CartItem citem : cart.getCartItems()) {
 				monitorBean.addToActivity("added item: " + citem.getName() + ", quantity : " + citem.getQuantity());
 			}
-			RequestContext.getCurrentInstance().update("form-1:panel");
-			RequestContext.getCurrentInstance().execute("resetActive(100, 'step-6');");
+			PrimeFaces.current().ajax().update("form-1:panel");
+			PrimeFaces.current().executeScript("resetActive(100, 'step-6');");
 			this.step = 5;
 		}
 	}
@@ -378,34 +378,34 @@ public class AutoCartBean implements Serializable {
 			this.selectedMake = null;
 			this.selectedModel = null;
 			this.cart.setVehicleYear(null);
-			RequestContext.getCurrentInstance().execute("resetActive(0, 'step-1');");
+			PrimeFaces.current().executeScript("resetActive(0, 'step-1');");
 			break;
 		case 1:
 			monitorBean.addToActivity("clicked back from model years tab");
 			this.step = 1;
 			this.selectedModel = null;
 			this.cart.setVehicleYear(null);
-			RequestContext.getCurrentInstance().execute("resetActive(20, 'step-2');");
+			PrimeFaces.current().executeScript("resetActive(20, 'step-2');");
 			break;
 		case 2:
 			monitorBean.addToActivity("clicked back from vin tab");
 			this.step = 2;
 			this.cart.setVehicleYear(null);
-			RequestContext.getCurrentInstance().execute("resetActive(40, 'step-3');");
+			PrimeFaces.current().executeScript("resetActive(40, 'step-3');");
 			break;
 		case 3:
 			monitorBean.addToActivity("clicked back from add items tab");
 			this.step = 3;
-			RequestContext.getCurrentInstance().execute("resetActive(60, 'step-4');");
+			PrimeFaces.current().executeScript("resetActive(60, 'step-4');");
 			break;
 		case 4:
 			monitorBean.addToActivity("clicked back from submit tab");
 			this.step = 4;
-			RequestContext.getCurrentInstance().execute("resetActive(80, 'step-5');");
+			PrimeFaces.current().executeScript("resetActive(80, 'step-5');");
 			break;
 		case 5:
 			this.step = 5;
-			RequestContext.getCurrentInstance().execute("resetActive(100, 'step-6');");
+			PrimeFaces.current().executeScript("resetActive(100, 'step-6');");
 			break;
 		}
 	}
@@ -437,18 +437,18 @@ public class AutoCartBean implements Serializable {
 		if (!this.cart.isNoVin() && !this.vinImageUploaded) {
 			if (this.cart.getVin().length() == 17) {
 				monitorBean.addToActivity("entered correct vin: " + cart.getVin());
-				RequestContext.getCurrentInstance().execute("resetActive(80, 'step-5');");
+				PrimeFaces.current().executeScript("resetActive(80, 'step-5');");
 				this.step = 4;
 				this.vinImageUploaded = false;
 			} else {
 				monitorBean.addToActivity("entered wrong vin: " + cart.getVin());
-				RequestContext.getCurrentInstance().execute("resetActive(60, 'step-4');");
+				PrimeFaces.current().executeScript("resetActive(60, 'step-4');");
 				Helper.addErrorMessage(Bundler.getValue("invalidVin"), "form-1:vin");
 			}
 		}else {
 			cart.setVin("");
 			monitorBean.addToActivity("selected no vin ");
-			RequestContext.getCurrentInstance().execute("resetActive(80, 'step-5');");
+			PrimeFaces.current().executeScript("resetActive(80, 'step-5');");
 			this.step = 4;
 		}
 	}

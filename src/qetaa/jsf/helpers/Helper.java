@@ -19,7 +19,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.imageio.ImageIO;
 
+import org.jboss.security.Base64Encoder;
 import java.util.Base64;;
+
 
 public class Helper {
 	private static String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxuz1234567890";

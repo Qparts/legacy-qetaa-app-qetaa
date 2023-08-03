@@ -1,11 +1,12 @@
 package qetaa.jsf.beans.customer;
 
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.GenericType;
@@ -13,17 +14,21 @@ import javax.ws.rs.core.Response;
 
 import qetaa.jsf.beans.reqs.Requester;
 import qetaa.jsf.helpers.AppConstants;
+import qetaa.jsf.helpers.Helper;
 import qetaa.jsf.helpers.PojoRequester;
 import qetaa.jsf.model.cart.ApprovedQuotationItem;
 import qetaa.jsf.model.cart.Cart;
+import qetaa.jsf.model.cart.CartReview;
 import qetaa.jsf.model.location.City;
 import qetaa.jsf.model.promotion.PromotionCode;
 import qetaa.jsf.model.vehicle.ModelYear;
 
 @Named(value="myOrdersBean")
-@SessionScoped
+@ViewScoped
 public class MyOrdersBean implements Serializable {
 
+	private static final String WHATSAPP_PHONE_NUNBER = "966550955954";
+//	private static final String WHATSAPP_PHONE_NUNBER = "966508448856";
 	private static final long serialVersionUID = 1L;
 	private Cart selectedCart;
 	private List<Cart> carts;
@@ -33,12 +38,24 @@ public class MyOrdersBean implements Serializable {
 
 	@Inject
 	private LoginBean loginBean;
+	
+	@Inject
+	private ActivityMonitorBean monitorBean;
 
 	@PostConstruct
 	public void init() {
 		this.selectedCart = new Cart();
 		initActiveCarts();
 		initCartVariables();
+	}
+	
+	
+	public void archiveOrder(Cart cart) {
+		monitorBean.addToActivity("Customer archived order no. " + cart.getId());
+		cart.setStatus('X');
+		Response r = reqs.putSecuredRequest(AppConstants.PUT_ARCHIVE_CART, cart);
+		this.carts.remove(cart);
+		Helper.addInfoMessage(" تم الغاء الطلب رقم " + cart.getId());
 	}
 
 	private void initActiveCarts() {
@@ -60,8 +77,21 @@ public class MyOrdersBean implements Serializable {
 			initApprovedItems(cart, header);
 			initCity(cart, header);
 			initPromoCode(cart, header);
+			initReviews(cart, header);
 		}
 
+	}
+	
+	private void initReviews(Cart cart, String header) {
+		try {
+			Response r = PojoRequester.getSecuredRequest(AppConstants.getVisibleReview(cart.getId()), header);
+			if(r.getStatus() == 200) {
+				List<CartReview> reviews = r.readEntity(new GenericType<List<CartReview>>() {});
+				cart.setReviews(reviews);
+			}
+		}catch(Exception ex) {
+			cart.setReviews(new ArrayList<>());
+		}
 	}
 	
 	private void initPromoCode(Cart cart, String header) {
@@ -125,6 +155,15 @@ public class MyOrdersBean implements Serializable {
 
 	public void setCarts(List<Cart> carts) {
 		this.carts = carts;
+	}
+	
+	public String getWhatsappLink(Cart cart) {
+		try {
+			String q= URLEncoder.encode("استفسار بخصوص الطلب رقم " + cart.getId(), "UTF-8");
+			return "https://wa.me/"+WHATSAPP_PHONE_NUNBER+"/?text=" + q;
+		}catch(Exception ex) {
+			return "https://wa.me/"+WHATSAPP_PHONE_NUNBER+"/";
+		}
 	}
 
 }

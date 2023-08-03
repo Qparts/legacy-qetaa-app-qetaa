@@ -29,13 +29,23 @@ public class Cart implements Serializable{
 	private boolean vinImage;
 	@JsonIgnore
 	private PromotionCode promoCodeObject;
-	
+	@JsonIgnore
+	private List<CartReview> reviews;
 	@JsonIgnore
 	private City city;
 	@JsonIgnore
 	private List<ApprovedQuotationItem> approvedItems;
 
 	
+	
+	public List<CartReview> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<CartReview> reviews) {
+		this.reviews = reviews;
+	}
+
 	@JsonIgnore
 	public double getTotalSales() {
 		double total = 0;
@@ -192,6 +202,29 @@ public class Cart implements Serializable{
 	public void setPromoCodeObject(PromotionCode promoCodeObject) {
 		this.promoCodeObject = promoCodeObject;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cart other = (Cart) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
 	
 	
 	

@@ -6,7 +6,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.primefaces.context.RequestContext;
+import org.primefaces.PrimeFaces;
 
 @Named(value = "registerDialogBean")
 @RequestScoped
@@ -20,7 +20,7 @@ public class RegisterDialogBean {
 		try {
 			if (null != loginBean && loginBean.getLoginStatus() == 'R')
 				if (!FacesContext.getCurrentInstance().isPostback()) {
-					RequestContext.getCurrentInstance().execute("document.getElementById('myBtn2').click()");
+					PrimeFaces.current().executeScript("document.getElementById('myBtn2').click()");
 				}
 		} catch (Exception ex) {
 			System.out.println("handled");

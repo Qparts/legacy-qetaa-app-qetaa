@@ -35,6 +35,12 @@
 			<h:outputText
 				value="#{activityMonitorBean.addToActivity('visited my_orders page')}" />
 		</h:form>
+		<h:form id="form-g">
+			<p:growl id="error-growl"
+				rendered="#{facesContext.maximumSeverity.ordinal eq 2}" />
+			<p:growl id="success-growl"
+				rendered="#{facesContext.maximumSeverity.ordinal eq 0}" />
+		</h:form>
 		<section id="account">
 		<div class="container">
 			<div class="row">
@@ -60,7 +66,7 @@
 		<section id="page"> <ui:repeat var="myCart"
 			value="#{myOrdersBean.carts}">
 			<div class="container">
-				<div class="row">
+				<div class="row" id="c#{myCart.id}">
 					<div class="col-md-10 col-md-offset-1 col-xs-12" id="payment-box">
 						<div class="col-md-3 col-xs-6">#{lex.theOrder} #{myCart.id}</div>
 						<div class="col-md-3 col-xs-6">
@@ -207,13 +213,54 @@
 									</div>
 								</div>
 
-								<div class="col-xs-12 text-center">
+								<div class="col-xs-12 col-md-12 text-center">
 									<br />
 									<h:outputLink rendered="#{myCart.status eq 'S'.charAt(0)}"
 										value="parts_order?order=#{myCart.id}"
 										class="btn btn-primary hvr-push">
 										<h:outputText value="#{lex.orderPartsFromQuotation}" />
 									</h:outputLink>
+								</div>
+								<div class="col-xs-6 col-md-6 text-center">
+									<br />
+									<h:outputLink rendered="#{myCart.status eq 'S'.charAt(0)}"
+										value="#{myOrdersBean.getWhatsappLink(myCart)}" 
+										class="btn btn-primary hvr-push">
+										<h:outputText value="استفسار" />
+									</h:outputLink>
+								</div>
+								<div class="col-xs-6 col-md-6 text-center">
+									<br />
+									<h:form>
+										<h:commandButton styleClass="btn btn-primary hvr-push"
+											value="الغاء الطلب" rendered="#{myCart.status eq 'S'.charAt(0)}"
+											actionListener="#{myOrdersBean.archiveOrder(myCart)}" />
+									</h:form>
+								</div>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{myCart.reviews.size() gt 0}">
+								<div class="col-xs-12 text-center">
+									<div class="paragraph-title" align="center">#{lex.reviews}</div>
+									<table
+										class="table table-striped table-bordered table-hover table-condensed">
+										<thead>
+											<tr>
+												<th>#{lex.date}</th>
+												<th>#{lex.reviews}</th>
+											</tr>
+										</thead>
+										<tbody>
+											<ui:repeat var="review" value="#{myCart.reviews}">
+												<tr>
+													<td><h:outputText value="#{review.created}">
+															<f:convertDateTime type="date" locale="en_US" />
+														</h:outputText></td>
+													<td><h:outputText value="#{review.reviewText}" /></td>
+												</tr>
+											</ui:repeat>
+										</tbody>
+									</table>
 								</div>
 							</h:panelGroup>
 						</div>
